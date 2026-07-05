@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: edusynth-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: edusynth-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: edusynth-redis
+          type: keyvalue
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: '["https://edusynth-umbaza.netlify.app"]'
+      - key: AI_PROVIDER
+        value: groq
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: IMAGE_PROVIDER
+        value: web_search
+      - key: IMAGE_REHOST_S3
+        value: "false"
+      - key: IMAGE_VISION_VERIFY
+        value: "false"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+
+  - type: keyvalue
+    name: edusynth-redis
+    plan: free
+    ipAllowList: []
+
+databases:
+  - name: edusynth-db
+    plan: free
+    databaseName: edusynth
+    user: edusynth

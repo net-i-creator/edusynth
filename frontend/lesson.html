@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок — УмБаза</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: { cyan: '#00d4ff', blue: '#3b82f6', violet: '#8b5cf6' },
+                        dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24' },
+                    },
+                    fontFamily: { sans: ['Manrope', 'Inter', 'system-ui', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>gsap.registerPlugin(ScrollTrigger);</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="text-white font-sans antialiased min-h-screen">
+
+    <!-- NAV -->
+    <nav class="sticky top-0 z-40 border-b border-white/5 glass">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
+                    <span class="text-accent-cyan font-bold text-xs">У</span>
+                </div>
+                <span class="font-bold">УмБаза</span>
+            </a>
+            <a href="/" class="text-sm text-white/40 hover:text-white/70 transition-colors">← На главную</a>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-12">
+        <!-- Loading -->
+        <div id="lesson-loading" class="text-center py-20">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-sm text-white/40">Загружаем урок...</p>
+        </div>
+
+        <!-- Lesson Content -->
+        <div id="lesson-content" class="hidden">
+            <div class="lesson-header mb-8">
+                <div class="flex items-center gap-2 text-sm text-white/35 mb-3">
+                    <span id="lesson-subject"></span>
+                    <span>·</span>
+                    <span id="lesson-grade"></span>
+                </div>
+                <h1 id="lesson-title" class="text-3xl md:text-4xl font-bold mb-2"></h1>
+                <div class="flex items-center gap-4 text-sm text-white/30">
+                    <span id="lesson-date"></span>
+                    <span>·</span>
+                    <span id="lesson-views"></span>
+                </div>
+            </div>
+
+            <div id="lesson-intro" class="lesson-intro lesson-content mb-8 glass rounded-xl p-5"></div>
+            <div id="lesson-main" class="lesson-main lesson-content mb-8"></div>
+
+            <div id="lesson-images-wrap" class="lesson-gallery-wrap hidden mb-8">
+                <h2 class="text-lg font-semibold mb-4 text-white/80">Иллюстрации</h2>
+                <div id="lesson-images" class="lesson-gallery"></div>
+                <p class="image-attribution mt-3">
+                    Наглядные иллюстрации из открытых источников
+                </p>
+            </div>
+
+            <div id="lesson-examples" class="lesson-examples mb-8">
+                <h2 class="text-lg font-semibold mb-4 text-white/80">Примеры</h2>
+                <div id="examples-list" class="space-y-4"></div>
+            </div>
+
+            <div id="lesson-keypoints" class="lesson-keypoints mb-8">
+                <h2 class="text-lg font-semibold mb-4 text-white/80">Ключевые моменты</h2>
+                <div id="keypoints-list" class="space-y-2"></div>
+            </div>
+
+            <div id="lesson-quiz" class="lesson-quiz mb-8">
+                <h2 class="text-lg font-semibold mb-6 text-white/80">Проверьте себя</h2>
+                <div id="quiz-questions" class="space-y-6"></div>
+                <button onclick="submitQuiz()" id="quiz-submit"
+                    class="btn-primary px-8 py-3 text-sm font-semibold mt-6">
+                    Проверить ответы
+                </button>
+
+                <div id="quiz-result" class="hidden mt-8 glass-strong rounded-2xl p-6">
+                    <div class="text-center">
+                        <div id="score-value" class="text-4xl font-bold text-accent-cyan"></div>
+                        <div id="quiz-result-text" class="text-sm text-white/40 mt-1"></div>
+                    </div>
+                    <div id="quiz-details" class="mt-6 space-y-3"></div>
+                </div>
+            </div>
+
+            <div class="text-xs text-white/25 text-center py-6 border-t border-white/5">
+                Урок создан с помощью нейросети. Содержание может содержать неточности — проверяйте важные факты.
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="lesson-error" class="hidden text-center py-20">
+            <h2 class="text-xl font-semibold mb-2">Урок не найден</h2>
+            <p class="text-white/40 mb-6">Возможно, ссылка устарела или урок был удалён.</p>
+            <a href="/" class="btn-primary inline-block px-6 py-2.5 text-sm">На главную</a>
+        </div>
+    </main>
+
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/animations.js"></script>
+    <script>
+        let currentLesson = null;
+        let selectedAnswers = [];
+
+        document.addEventListener('DOMContentLoaded', loadLesson);
+
+        async function loadLesson() {
+            const params = new URLSearchParams(window.location.search);
+            const lessonId = params.get('id');
+
+            if (!lessonId) {
+                showError();
+                return;
+            }
+
+            const cached = localStorage.getItem('current_lesson');
+            if (cached) {
+                const lesson = JSON.parse(cached);
+                if (lesson.id === lessonId) {
+                    renderLesson(lesson);
+                    return;
+                }
+            }
+
+            try {
+                const lesson = await api.getLesson(lessonId);
+                renderLesson(lesson);
+            } catch (error) {
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('lesson-loading').classList.add('hidden');
+            document.getElementById('lesson-error').classList.remove('hidden');
+        }
+
+        function renderLesson(lesson) {
+            currentLesson = lesson;
+            selectedAnswers = new Array(lesson.content.quiz?.length || 0).fill(-1);
+
+            document.getElementById('lesson-loading').classList.add('hidden');
+            document.getElementById('lesson-content').classList.remove('hidden');
+
+            document.getElementById('lesson-title').textContent = lesson.content.title;
+            document.getElementById('lesson-subject').textContent = lesson.subject;
+            document.getElementById('lesson-grade').textContent = `${lesson.grade} класс`;
+            document.getElementById('lesson-date').textContent = new Date(lesson.created_at).toLocaleDateString('ru-RU');
+            document.getElementById('lesson-views').textContent = `${lesson.views_count} просмотров`;
+
+            document.getElementById('lesson-intro').innerHTML = `<p>${lesson.content.introduction}</p>`;
+            document.getElementById('lesson-main').innerHTML = lesson.content.main_content;
+
+            if (lesson.image_urls && lesson.image_urls.length > 0) {
+                const wrap = document.getElementById('lesson-images-wrap');
+                const gallery = document.getElementById('lesson-images');
+                wrap.classList.remove('hidden');
+                gallery.innerHTML = lesson.image_urls.map((url, i) =>
+                    `<img src="${url}" alt="Иллюстрация ${i + 1}" class="lesson-illustration" data-idx="${i}">`
+                ).join('');
+                gallery.querySelectorAll('.lesson-illustration').forEach(img => {
+                    img.addEventListener('click', () => {
+                        openLightbox(lesson.image_urls[parseInt(img.dataset.idx, 10)]);
+                    });
+                });
+            }
+
+            const examplesList = document.getElementById('examples-list');
+            lesson.content.examples.forEach((ex, i) => {
+                examplesList.innerHTML += `
+                    <div class="glass rounded-xl p-4">
+                        <div class="text-sm font-medium text-white/30 mb-2">Пример ${i + 1}</div>
+                        <div class="lesson-content">${ex}</div>
+                    </div>
+                `;
+            });
+
+            const keypointsList = document.getElementById('keypoints-list');
+            lesson.content.key_points.forEach(point => {
+                keypointsList.innerHTML += `
+                    <div class="flex items-start gap-3 p-3 glass rounded-xl">
+                        <svg class="w-5 h-5 text-accent-cyan mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm text-white/60">${point}</span>
+                    </div>
+                `;
+            });
+
+            const quizContainer = document.getElementById('quiz-questions');
+            lesson.content.quiz.forEach((q, qi) => {
+                const optionsHtml = q.options.map((opt, oi) => `
+                    <div class="quiz-option" onclick="selectAnswer(${qi}, ${oi})" id="q${qi}o${oi}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full border-2 border-white/20 flex items-center justify-center flex-shrink-0 option-circle">
+                                <span class="text-xs font-medium">${String.fromCharCode(65 + oi)}</span>
+                            </div>
+                            <span class="text-sm text-white/70">${opt}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                quizContainer.innerHTML += `
+                    <div class="quiz-question">
+                        <div class="font-medium mb-3 text-white/80">${qi + 1}. ${q.question}</div>
+                        <div class="space-y-2">${optionsHtml}</div>
+                    </div>
+                `;
+            });
+
+            renderMathInElement(document.getElementById('lesson-content'), {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                ],
+                throwOnError: false,
+            });
+
+            renderMathInElement(document.getElementById('quiz-questions'), {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                ],
+                throwOnError: false,
+            });
+
+            animateLessonContent();
+        }
+
+        function selectAnswer(questionIdx, optionIdx) {
+            selectedAnswers[questionIdx] = optionIdx;
+
+            const question = currentLesson.content.quiz[questionIdx];
+            question.options.forEach((_, oi) => {
+                const el = document.getElementById(`q${questionIdx}o${oi}`);
+                el.classList.remove('selected');
+                const circle = el.querySelector('.option-circle');
+                circle.classList.remove('border-accent-cyan', 'bg-accent-cyan', 'text-dark-900');
+                circle.classList.add('border-white/20');
+            });
+
+            const selected = document.getElementById(`q${questionIdx}o${optionIdx}`);
+            selected.classList.add('selected');
+            const circle = selected.querySelector('.option-circle');
+            circle.classList.remove('border-white/20');
+            circle.classList.add('border-accent-cyan', 'bg-accent-cyan', 'text-dark-900');
+        }
+
+        async function submitQuiz() {
+            if (selectedAnswers.includes(-1)) {
+                alert('Пожалуйста, ответьте на все вопросы');
+                return;
+            }
+
+            const btn = document.getElementById('quiz-submit');
+            btn.disabled = true;
+            btn.textContent = 'Проверяем...';
+
+            try {
+                let result;
+                try {
+                    result = await api.checkQuiz(currentLesson.id, selectedAnswers);
+                } catch (e) {
+                    result = checkQuizLocally();
+                }
+                showQuizResult(result);
+            } catch (error) {
+                alert('Ошибка проверки: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Проверить ответы';
+            }
+        }
+
+        function checkQuizLocally() {
+            const quiz = currentLesson.content.quiz;
+            let correct = 0;
+            const results = quiz.map((q, i) => {
+                const isCorrect = selectedAnswers[i] === q.correct_index;
+                if (isCorrect) correct++;
+                return {
+                    question: q.question,
+                    selected: selectedAnswers[i],
+                    correct: q.correct_index,
+                    is_correct: isCorrect,
+                    explanation: q.explanation || '',
+                };
+            });
+
+            return {
+                total: quiz.length,
+                correct,
+                score_percent: Math.round((correct / quiz.length) * 100),
+                results,
+            };
+        }
+
+        function showQuizResult(result) {
+            const resultEl = document.getElementById('quiz-result');
+            resultEl.classList.remove('hidden');
+
+            const total = result.total || currentLesson.content.quiz.length;
+            const correct = result.correct || 0;
+            const score = typeof result.score_percent === 'number' && !isNaN(result.score_percent)
+                ? result.score_percent
+                : Math.round((correct / total) * 100);
+
+            document.getElementById('score-value').textContent = score + '%';
+            document.getElementById('quiz-result-text').textContent =
+                `${correct} из ${total} правильных ответов`;
+
+            if (result.results) {
+                result.results.forEach((r, i) => {
+                    const selectedEl = document.getElementById(`q${i}o${r.selected}`);
+                    const correctEl = document.getElementById(`q${i}o${r.correct}`);
+
+                    if (selectedEl && r.is_correct) {
+                        selectedEl.classList.add('correct');
+                    } else if (selectedEl && correctEl) {
+                        selectedEl.classList.add('incorrect');
+                        correctEl.classList.add('correct');
+                    }
+                });
+
+                const detailsEl = document.getElementById('quiz-details');
+                detailsEl.innerHTML = '';
+                result.results.forEach((r, i) => {
+                    detailsEl.innerHTML += `
+                        <div class="p-3 rounded-xl glass ${r.is_correct ? 'border border-green-500/20' : 'border border-red-500/20'}">
+                            <div class="flex items-center gap-2 text-sm font-medium ${r.is_correct ? 'text-green-400' : 'text-red-400'}">
+                                ${r.is_correct ? '✓' : '✗'} Вопрос ${i + 1}
+                            </div>
+                            ${r.explanation ? `<p class="text-xs text-white/40 mt-1">${r.explanation}</p>` : ''}
+                        </div>
+                    `;
+                });
+
+                renderMathInElement(document.getElementById('quiz-result'), {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                    ],
+                    throwOnError: false,
+                });
+            }
+
+            animateQuizResult(score);
+            resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function openLightbox(url) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

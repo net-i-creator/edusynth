@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УмБаза — AI-генератор школьных уроков</title>
+    <meta name="description" content="Бесплатный AI-генератор школьных уроков с иллюстрациями и квизом">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: { cyan: '#00d4ff', blue: '#3b82f6', violet: '#8b5cf6' },
+                        dark: { 900: '#0a0a0f', 800: '#12121a', 700: '#1a1a24' },
+                    },
+                    fontFamily: { sans: ['Manrope', 'Inter', 'system-ui', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>gsap.registerPlugin(ScrollTrigger);</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="text-white font-sans antialiased overflow-x-hidden">
+
+    <!-- Background spheres -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="sphere sphere-cyan w-96 h-96 -top-20 -left-20" id="sphere-1"></div>
+        <div class="sphere sphere-violet w-80 h-80 top-1/3 -right-32" id="sphere-2"></div>
+        <div class="sphere sphere-blue w-72 h-72 bottom-20 left-1/4" id="sphere-3"></div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="relative z-10 border-b border-white/5">
+        <div class="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl glass-strong flex items-center justify-center">
+                    <span class="text-accent-cyan font-bold text-sm">У</span>
+                </div>
+                <span class="font-bold text-lg tracking-tight">УмБаза</span>
+            </a>
+            <span class="text-xs font-medium text-white/30 uppercase tracking-widest">Бесплатно</span>
+        </div>
+    </nav>
+
+    <main class="relative z-10 max-w-4xl mx-auto px-6 py-12 md:py-20">
+
+        <!-- HERO -->
+        <section class="text-center mb-16">
+            <div class="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-accent-cyan mb-6">
+                <span class="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse"></span>
+                AI-генератор уроков
+            </div>
+            <h1 class="hero-title text-4xl md:text-6xl font-extrabold tracking-tight mb-4 leading-tight">
+                Урок за <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-violet">30 секунд</span>
+            </h1>
+            <p class="hero-subtitle text-lg text-white/50 max-w-xl mx-auto">
+                Введите тему — получите готовый урок с текстом, иллюстрациями и квизом для самопроверки
+            </p>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="hero-about mb-16">
+            <div class="glass-strong rounded-2xl p-6 md:p-8">
+                <p class="text-white/60 leading-relaxed text-center max-w-2xl mx-auto">
+                    <strong class="text-white/80">УмБаза</strong> — бесплатный сервис для создания школьных уроков с помощью искусственного интеллекта.
+                    Подходит для учеников, учителей и родителей. Просто укажите тему — мы сделаем остальное.
+                </p>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="hero-steps mb-16">
+            <h2 class="text-sm font-semibold text-white/40 uppercase tracking-widest text-center mb-8">Как это работает</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="step-card glass rounded-xl p-5">
+                    <div class="w-8 h-8 rounded-lg bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center text-accent-cyan font-bold text-sm mb-3">1</div>
+                    <h3 class="font-semibold mb-1">Введите тему</h3>
+                    <p class="text-sm text-white/45">Укажите тему урока, класс и предмет</p>
+                </div>
+                <div class="step-card glass rounded-xl p-5">
+                    <div class="w-8 h-8 rounded-lg bg-accent-blue/10 border border-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-sm mb-3">2</div>
+                    <h3 class="font-semibold mb-1">AI создаёт урок</h3>
+                    <p class="text-sm text-white/45">Нейросеть пишет текст и подбирает иллюстрации</p>
+                </div>
+                <div class="step-card glass rounded-xl p-5">
+                    <div class="w-8 h-8 rounded-lg bg-accent-violet/10 border border-accent-violet/20 flex items-center justify-center text-accent-violet font-bold text-sm mb-3">3</div>
+                    <h3 class="font-semibold mb-1">Готовый результат</h3>
+                    <p class="text-sm text-white/45">Текст, картинки и квиз для самопроверки</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL SELECTOR -->
+        <section class="hero-levels mb-8">
+            <h2 class="text-sm font-semibold text-white/40 uppercase tracking-widest text-center mb-6">Уровень образования</h2>
+            <div class="grid md:grid-cols-3 gap-3">
+                <button type="button" class="level-btn level-btn-active" id="level-school" onclick="selectLevel('school')">
+                    <div class="font-semibold mb-0.5">Школа</div>
+                    <div class="text-xs text-white/40">5–11 класс</div>
+                </button>
+                <button type="button" class="level-btn level-btn-disabled" disabled>
+                    <div class="flex items-center justify-between">
+                        <div class="font-semibold mb-0.5">ВУЗ</div>
+                        <span class="badge-soon">Скоро</span>
+                    </div>
+                    <div class="text-xs text-white/40">Высшее образование</div>
+                </button>
+                <button type="button" class="level-btn level-btn-disabled" disabled>
+                    <div class="flex items-center justify-between">
+                        <div class="font-semibold mb-0.5">Доп. образование</div>
+                        <span class="badge-soon">Скоро</span>
+                    </div>
+                    <div class="text-xs text-white/40">Курсы и повышение квалификации</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- GENERATION FORM -->
+        <section id="gen-section" class="hero-form">
+            <div class="glass-strong rounded-2xl p-6 md:p-8 max-w-xl mx-auto">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white/60 mb-1.5">Тема урока</label>
+                        <input type="text" id="topic" placeholder="Например: Обыкновенные дроби"
+                            class="input-glass w-full px-4 py-3 text-sm">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white/60 mb-1.5">Класс</label>
+                            <select id="grade" class="input-glass w-full px-4 py-3 text-sm">
+                                <option value="">Выберите</option>
+                                <option value="5">5 класс</option>
+                                <option value="6">6 класс</option>
+                                <option value="7">7 класс</option>
+                                <option value="8">8 класс</option>
+                                <option value="9">9 класс</option>
+                                <option value="10">10 класс</option>
+                                <option value="11">11 класс</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white/60 mb-1.5">Предмет</label>
+                            <select id="subject" class="input-glass w-full px-4 py-3 text-sm">
+                                <option value="">Выберите</option>
+                                <option value="Математика">Математика</option>
+                                <option value="Алгебра">Алгебра</option>
+                                <option value="Геометрия">Геометрия</option>
+                                <option value="Физика">Физика</option>
+                                <option value="Химия">Химия</option>
+                                <option value="Биология">Биология</option>
+                                <option value="История">История</option>
+                                <option value="Обществознание">Обществознание</option>
+                                <option value="Русский язык">Русский язык</option>
+                                <option value="Литература">Литература</option>
+                                <option value="Информатика">Информатика</option>
+                                <option value="География">География</option>
+                                <option value="Английский язык">Английский язык</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateLesson()" id="generate-btn"
+                        class="btn-primary btn-magnetic w-full py-3.5 text-sm font-semibold mt-2">
+                        Сгенерировать урок
+                    </button>
+                </div>
+
+                <p class="text-xs text-white/25 mt-4 text-center">
+                    Генерация занимает 10–30 секунд
+                </p>
+            </div>
+        </section>
+
+        <!-- LOADING STATE -->
+        <section id="loading-section" class="hidden text-center py-20">
+            <div class="spinner mx-auto mb-6"></div>
+            <h2 class="text-xl font-semibold mb-2">Генерируем урок...</h2>
+            <div id="loading-status" class="gen-status">AI создаёт текст урока</div>
+            <div class="flex justify-center gap-1 mt-6">
+                <span class="loading-dot w-2 h-2 bg-accent-cyan rounded-full"></span>
+                <span class="loading-dot w-2 h-2 bg-accent-cyan rounded-full"></span>
+                <span class="loading-dot w-2 h-2 bg-accent-cyan rounded-full"></span>
+            </div>
+        </section>
+
+        <!-- ERROR STATE -->
+        <section id="error-section" class="hidden text-center py-20">
+            <div class="w-16 h-16 rounded-full glass flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold mb-2">Ошибка генерации</h2>
+            <p id="error-message" class="text-white/45 mb-6">Что-то пошло не так. Попробуйте ещё раз.</p>
+            <button onclick="resetForm()" class="btn-primary px-6 py-2.5 text-sm">Попробовать снова</button>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 border-t border-white/5 mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center">
+            <div class="font-bold text-lg mb-1">УмБаза</div>
+            <div class="text-xs text-white/30">Бесплатный AI-генератор школьных уроков</div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/animations.js"></script>
+    <script>
+        function selectLevel(level) {
+            if (level !== 'school') return;
+        }
+
+        async function generateLesson() {
+            const topic = document.getElementById('topic').value.trim();
+            const grade = document.getElementById('grade').value;
+            const subject = document.getElementById('subject').value;
+
+            if (!topic || !grade || !subject) {
+                showToast('Пожалуйста, заполните все поля', 'error');
+                return;
+            }
+
+            document.getElementById('gen-section').classList.add('hidden');
+            document.querySelector('.hero-levels').classList.add('hidden');
+            document.getElementById('loading-section').classList.remove('hidden');
+            animateLoading();
+
+            setTimeout(() => {
+                document.getElementById('loading-status').textContent = 'Ищем схемы из учебников...';
+            }, 5000);
+
+            try {
+                const lesson = await api.generateLesson(topic, grade, subject);
+                localStorage.setItem('current_lesson', JSON.stringify(lesson));
+                window.location.href = `lesson.html?id=${lesson.id}`;
+            } catch (error) {
+                document.getElementById('loading-section').classList.add('hidden');
+                document.getElementById('error-section').classList.remove('hidden');
+                const msg = error.message || 'Попробуйте ещё раз';
+                document.getElementById('error-message').textContent = msg;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('error-section').classList.add('hidden');
+            document.getElementById('gen-section').classList.remove('hidden');
+            document.querySelector('.hero-levels').classList.remove('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

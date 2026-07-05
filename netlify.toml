@@ -1,0 +1,11 @@
+[build]
+  publish = "frontend"
+
+[[edge_functions]]
+  path = "/api/*"
+  function = "api-proxy"
+
+[[redirects]]
+  from = "/lesson"
+  to = "/lesson.html"
+  status = 200

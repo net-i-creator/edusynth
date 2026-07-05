@@ -1,0 +1,59 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.database import get_db
+from app.schemas.auth import UserRegister, UserLogin, UserResponse, TokenResponse, TokenRefresh
+from app.services.auth import register_user, authenticate_user, create_access_token, create_refresh_token, decode_token, get_user_by_id
+from app.api.deps import get_current_user
+from app.models.user import User
+
+router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+@router.post("/register", response_model=TokenResponse)
+async def register(data: UserRegister, db: Annotated[AsyncSession, Depends(get_db)]):
+    try:
+        user = await register_user(db, data.email, data.password, data.full_name)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+
+    return TokenResponse(
+        access_token=create_access_token(user.id),
+        refresh_token=create_refresh_token(user.id),
+    )
+
+
+@router.post("/login", response_model=TokenResponse)
+async def login(data: UserLogin, db: Annotated[AsyncSession, Depends(get_db)]):
+    user = await authenticate_user(db, data.email, data.password)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    return TokenResponse(
+        access_token=create_access_token(user.id),
+        refresh_token=create_refresh_token(user.id),
+    )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh(data: TokenRefresh):
+    try:
+        payload = decode_token(data.refresh_token)
+        if payload.get("type") != "refresh":
+            raise ValueError("Not a refresh token")
+        from uuid import UUID
+        user_id = UUID(payload["sub"])
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+
+    return TokenResponse(
+        access_token=create_access_token(user_id),
+        refresh_token=create_refresh_token(user_id),
+    )
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_me(user: Annotated[User, Depends(get_current_user)]):
+    return user
