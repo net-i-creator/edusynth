@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: edusynth-api
+    name: edusynth
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: free
     healthCheckPath: /health
     envVars:
@@ -17,7 +17,7 @@ services:
           type: keyvalue
           property: connectionString
       - key: CORS_ORIGINS
-        value: '["https://edusynth-umbaza.netlify.app"]'
+        value: '["*"]'
       - key: AI_PROVIDER
         value: groq
       - key: GROQ_MODEL

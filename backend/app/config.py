@@ -15,7 +15,6 @@ class Settings(BaseSettings):
         "http://localhost:80",
         "http://localhost:3000",
         "http://localhost",
-        "https://edusynth-umbaza.netlify.app",
     ]
 
     # Database

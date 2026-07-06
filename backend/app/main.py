@@ -1,8 +1,12 @@
 import logging
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.api import auth, lessons, quiz, dashboard
@@ -61,3 +65,15 @@ async def health_check():
         "version": "1.0.0",
         "database": "ok" if db_ok else "error",
     }
+
+
+FRONTEND_DIR = Path(os.environ.get("FRONTEND_DIR", ""))
+if not FRONTEND_DIR.is_dir():
+    FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
+
+if FRONTEND_DIR.is_dir():
+    @app.get("/lesson")
+    async def lesson_page():
+        return FileResponse(FRONTEND_DIR / "lesson.html")
+
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
