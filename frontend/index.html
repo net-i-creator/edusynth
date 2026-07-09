@@ -319,7 +319,7 @@
             const config = EDUCATION_LEVELS[level];
             if (!config) return;
 
-    if !config.enabled) {
+            if (!config.enabled) {
                 showToast(`${config.label} — скоро будет доступно`, 'info');
                 return;
             }
@@ -334,6 +334,11 @@
 
         async function generateLesson() {
             if (!requireAuthForGeneration()) return;
+
+            if (!selectedLevel) {
+                showToast('Сначала выберите уровень образования', 'error');
+                return;
+            }
 
             const topic = document.getElementById('topic').value.trim();
             const grade = document.getElementById('grade').value;
@@ -354,11 +359,6 @@
             setTimeout(() => {
                 document.getElementById('loading-status').textContent = 'Ищем схемы из учебников...';
             }, 5000);
-
-            if (!selectedLevel) {
-                showToast('Сначала выберите уровень образования', 'error');
-                return;
-            }
 
             try {
                 const lesson = await api.generateLesson(topic, grade, subject, selectedLevel);
