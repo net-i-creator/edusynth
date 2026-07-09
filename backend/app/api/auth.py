@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserRegister, db: Annotated[AsyncSession, Depends(get_db)]):
     try:
-        user = await register_user(db, data.email, data.password, data.full_name)
+        user = await register_user(db, data.email, data.password, data.full_name, data.role)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

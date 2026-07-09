@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:80",
         "http://localhost:3000",
+        "http://localhost:8766",
         "http://localhost",
+        "http://127.0.0.1:8766",
     ]
 
     # Database
@@ -40,7 +42,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 30
 
-    # AI Provider
+    # Guest access
+    guest_lesson_limit: int = 1
     ai_provider: str = "yandex"  # "yandex" or "groq"
 
     # Groq

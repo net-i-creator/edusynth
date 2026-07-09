@@ -2,7 +2,7 @@ import uuid
 import logging
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +17,8 @@ from app.services.auth import get_user_by_id
 from app.services.cache import generate_topic_hash, get_cached_lesson, cache_lesson
 from app.services.yandex_ai import generate_lesson_text
 from app.services.illustrations import get_lesson_illustrations
+from app.services.education_levels import validate_lesson_params
+from app.services.guest_limit import check_guest_can_generate, record_guest_generation
 
 import jwt
 from app.config import get_settings
@@ -45,24 +47,36 @@ async def get_optional_user(
         return None
 
 
+def _lesson_to_response(lesson: Lesson, content: LessonContent | None = None) -> LessonResponse:
+    return LessonResponse(
+        id=lesson.id,
+        topic=lesson.topic,
+        grade=lesson.grade,
+        grade_label=lesson.grade_label,
+        education_level=lesson.education_level or "school",
+        subject=lesson.subject,
+        content=content or LessonContent(**lesson.content_json),
+        image_urls=lesson.image_urls,
+        created_at=lesson.created_at,
+        views_count=lesson.views_count,
+    )
+
+
 @router.post("/generate", response_model=LessonResponse)
 async def generate_lesson(
     data: GenerateLessonRequest,
     user: Annotated[Optional[User], Depends(get_optional_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    x_guest_id: Annotated[str | None, Header()] = None,
 ):
-    if data.grade < 5 or data.grade > 11:
-        raise HTTPException(status_code=400, detail="Grade must be between 5 and 11")
+    grade_label = validate_lesson_params(data.education_level, data.grade)
+    topic_hash = generate_topic_hash(data.topic, data.grade, data.subject, data.education_level)
 
-    topic_hash = generate_topic_hash(data.topic, data.grade, data.subject)
-
-    # Check Redis cache first
     cached = await get_cached_lesson(topic_hash)
     if cached:
         result = await db.execute(select(Lesson).where(Lesson.topic_hash == topic_hash))
         lesson = result.scalar_one_or_none()
 
-        # Regenerate illustrations if cached lesson has none
         if not cached.get("image_urls") and lesson and lesson.content_json:
             try:
                 content = LessonContent(**lesson.content_json)
@@ -89,15 +103,24 @@ async def generate_lesson(
 
         return LessonResponse(**cached)
 
-    # Generate new lesson via YandexGPT
+    if not user:
+        if not x_guest_id:
+            raise HTTPException(status_code=400, detail="X-Guest-Id header required for anonymous users")
+        await check_guest_can_generate(x_guest_id)
+
     try:
-        content = await generate_lesson_text(data.topic, data.grade, data.subject)
+        content = await generate_lesson_text(
+            data.topic,
+            data.grade,
+            data.subject,
+            data.education_level,
+            grade_label,
+        )
     except ValueError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI generation failed: {str(e)}")
 
-    # Generate illustrations via hybrid web search
     image_urls = []
     try:
         image_urls = await get_lesson_illustrations(
@@ -106,11 +129,12 @@ async def generate_lesson(
     except Exception as e:
         logger.warning(f"Illustration generation failed for '{data.topic}': {e}")
 
-    # Save to PostgreSQL
     lesson = Lesson(
         topic_hash=topic_hash,
         topic=data.topic,
+        education_level=data.education_level,
         grade=data.grade,
+        grade_label=grade_label,
         subject=data.subject,
         content_json=content.model_dump(),
         image_urls=image_urls if image_urls else None,
@@ -119,17 +143,19 @@ async def generate_lesson(
     await db.commit()
     await db.refresh(lesson)
 
-    # Create progress record (only for logged-in users)
     if user:
         progress = UserLessonProgress(user_id=user.id, lesson_id=lesson.id)
         db.add(progress)
         await db.commit()
+    elif x_guest_id:
+        await record_guest_generation(x_guest_id)
 
-    # Cache in Redis
     response_data = {
         "id": str(lesson.id),
         "topic": lesson.topic,
         "grade": lesson.grade,
+        "grade_label": lesson.grade_label,
+        "education_level": lesson.education_level,
         "subject": lesson.subject,
         "content": content.model_dump(),
         "image_urls": lesson.image_urls,
@@ -138,16 +164,7 @@ async def generate_lesson(
     }
     await cache_lesson(topic_hash, response_data)
 
-    return LessonResponse(
-        id=lesson.id,
-        topic=lesson.topic,
-        grade=lesson.grade,
-        subject=lesson.subject,
-        content=content,
-        image_urls=lesson.image_urls,
-        created_at=lesson.created_at,
-        views_count=lesson.views_count,
-    )
+    return _lesson_to_response(lesson, content)
 
 
 @router.get("/{lesson_id}", response_model=LessonResponse)
@@ -164,16 +181,7 @@ async def get_lesson(
     lesson.views_count += 1
     await db.commit()
 
-    return LessonResponse(
-        id=lesson.id,
-        topic=lesson.topic,
-        grade=lesson.grade,
-        subject=lesson.subject,
-        content=LessonContent(**lesson.content_json),
-        image_urls=lesson.image_urls,
-        created_at=lesson.created_at,
-        views_count=lesson.views_count,
-    )
+    return _lesson_to_response(lesson)
 
 
 @router.get("/history/", response_model=list[LessonListItem])
@@ -196,6 +204,8 @@ async def get_lesson_history(
             id=lesson.id,
             topic=lesson.topic,
             grade=lesson.grade,
+            grade_label=lesson.grade_label,
+            education_level=lesson.education_level or "school",
             subject=lesson.subject,
             created_at=lesson.created_at,
             views_count=lesson.views_count,

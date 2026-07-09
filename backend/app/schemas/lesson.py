@@ -1,12 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
+from typing import Literal
 
 
 class GenerateLessonRequest(BaseModel):
     topic: str
-    grade: int  # 5-11
+    grade: int
     subject: str
+    education_level: Literal["school", "university", "extra"] = "school"
 
 
 class QuizQuestion(BaseModel):
@@ -29,6 +31,8 @@ class LessonResponse(BaseModel):
     id: UUID
     topic: str
     grade: int
+    grade_label: str | None = None
+    education_level: str = "school"
     subject: str
     content: LessonContent
     image_urls: list[str] | None
@@ -42,6 +46,8 @@ class LessonListItem(BaseModel):
     id: UUID
     topic: str
     grade: int
+    grade_label: str | None = None
+    education_level: str = "school"
     subject: str
     created_at: datetime
     views_count: int

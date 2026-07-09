@@ -23,8 +23,8 @@ def _get_redis() -> redis.Redis | None:
     return _redis_client
 
 
-def generate_topic_hash(topic: str, grade: int, subject: str) -> str:
-    raw = f"{topic.strip().lower()}:{grade}:{subject.strip().lower()}"
+def generate_topic_hash(topic: str, grade: int, subject: str, education_level: str = "school") -> str:
+    raw = f"{education_level}:{topic.strip().lower()}:{grade}:{subject.strip().lower()}"
     return hashlib.sha256(raw.encode()).hexdigest()
 
 

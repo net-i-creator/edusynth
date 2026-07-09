@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — УмБаза</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { accent: { cyan: '#0099ff', blue: '#2563eb', violet: '#7c3aed' } } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+    <nav class="relative z-10 border-b border-theme">
+        <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
+                    <span class="text-accent-blue font-bold text-xs">У</span>
+                </div>
+                <span class="font-bold text-theme-primary">УмБаза</span>
+            </a>
+            <a href="/" class="text-sm text-theme-muted hover:text-accent-blue">← На главную</a>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex items-center justify-center px-6 py-12">
+        <div class="w-full max-w-md">
+            <div id="limit-notice" class="hidden mb-6 p-4 rounded-xl glass border border-amber-200 bg-amber-50/50 text-sm text-amber-800">
+                Вы использовали бесплатный урок. Войдите или зарегистрируйтесь, чтобы продолжить.
+            </div>
+
+            <div class="glass-strong rounded-2xl p-6 md:p-8">
+                <h1 class="text-2xl font-bold text-theme-primary mb-1" id="auth-title">Вход</h1>
+                <p class="text-sm text-theme-muted mb-6">Личный кабинет УмБаза</p>
+
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Email</label>
+                        <input type="email" id="login-email" required class="input-glass w-full px-4 py-3 text-sm" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Пароль</label>
+                        <input type="password" id="login-password" required class="input-glass w-full px-4 py-3 text-sm" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Войти</button>
+                </form>
+
+                <form id="register-form" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Кто вы?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="student" checked class="sr-only">
+                                <span class="block text-center py-2.5 px-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer role-option-label">Ученик</span>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="parent" class="sr-only">
+                                <span class="block text-center py-2.5 px-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer role-option-label">Родитель</span>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="teacher" class="sr-only">
+                                <span class="block text-center py-2.5 px-2 rounded-lg border border-slate-200 text-xs font-medium cursor-pointer role-option-label">Преподаватель</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Имя</label>
+                        <input type="text" id="reg-name" class="input-glass w-full px-4 py-3 text-sm" placeholder="Иван Иванов">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Email</label>
+                        <input type="email" id="reg-email" required class="input-glass w-full px-4 py-3 text-sm" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Пароль</label>
+                        <input type="password" id="reg-password" required minlength="6" class="input-glass w-full px-4 py-3 text-sm" placeholder="Минимум 6 символов">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Зарегистрироваться</button>
+                </form>
+
+                <p class="text-center text-sm text-theme-muted mt-6">
+                    <button type="button" id="toggle-auth" class="text-accent-blue hover:underline">Нет аккаунта? Регистрация</button>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const isRegister = params.get('mode') === 'register';
+        const isLimit = params.get('reason') === 'limit';
+        const redirect = params.get('redirect') || '/';
+
+        if (isLimit) document.getElementById('limit-notice').classList.remove('hidden');
+        if (isRegister) showRegister();
+
+        let registerMode = isRegister;
+
+        document.getElementById('toggle-auth').addEventListener('click', () => {
+            registerMode = !registerMode;
+            registerMode ? showRegister() : showLogin();
+        });
+
+        function showRegister() {
+            document.getElementById('auth-title').textContent = 'Регистрация';
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('toggle-auth').textContent = 'Уже есть аккаунт? Войти';
+        }
+
+        function showLogin() {
+            document.getElementById('auth-title').textContent = 'Вход';
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('toggle-auth').textContent = 'Нет аккаунта? Регистрация';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const data = await api.login(
+                    document.getElementById('login-email').value,
+                    document.getElementById('login-password').value
+                );
+                api.setTokens(data.access_token, data.refresh_token);
+                const user = await api.getMe();
+                setUser(user);
+                window.location.href = redirect;
+            } catch (err) {
+                alert(err.message || 'Ошибка входа');
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
+                const data = await api.register(
+                    document.getElementById('reg-email').value,
+                    document.getElementById('reg-password').value,
+                    document.getElementById('reg-name').value || null,
+                    role
+                );
+                api.setTokens(data.access_token, data.refresh_token);
+                const user = await api.getMe();
+                setUser(user);
+                window.location.href = redirect;
+            } catch (err) {
+                alert(err.message || 'Ошибка регистрации');
+            }
+        });
+
+        if (isLoggedIn()) window.location.href = redirect === '/' ? 'account.html' : redirect;
+
+        document.querySelectorAll('.role-option input').forEach(input => {
+            input.addEventListener('change', () => {
+                document.querySelectorAll('.role-option-label').forEach(l => {
+                    l.classList.remove('border-accent-blue', 'bg-blue-50', 'text-accent-blue');
+                });
+                if (input.checked) {
+                    input.nextElementSibling.classList.add('border-accent-blue', 'bg-blue-50', 'text-accent-blue');
+                }
+            });
+        });
+        document.querySelector('.role-option input:checked')?.dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>

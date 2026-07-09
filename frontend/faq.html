@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — УмБаза</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { accent: { cyan: '#0099ff', blue: '#2563eb', violet: '#7c3aed' } } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <nav class="relative z-10 border-b border-theme">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
+                    <span class="text-accent-blue font-bold text-xs">У</span>
+                </div>
+                <span class="font-bold text-theme-primary">УмБаза</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="account.html" class="nav-link text-sm">Кабинет</a>
+                <a href="/" class="text-sm text-theme-muted hover:text-accent-blue">← На главную</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-10 md:py-14">
+        <h1 class="text-3xl font-bold text-theme-primary mb-2">FAQ</h1>
+        <p class="text-theme-secondary mb-10">Ответы для учеников, родителей и преподавателей</p>
+
+        <div class="space-y-3">
+            <details class="faq-item glass rounded-xl p-5 group" open>
+                <summary class="font-semibold text-theme-primary cursor-pointer list-none flex items-center justify-between">
+                    Для учеников
+                    <span class="text-theme-muted text-lg group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <div class="mt-4 text-sm text-theme-secondary leading-relaxed space-y-3">
+                    <p><strong class="text-theme-primary">УмБаза</strong> помогает быстро разобраться в любой теме: выберите уровень (школа, вуз или доп. образование), укажите класс/курс, предмет и тему — получите урок с объяснением, иллюстрациями и квизом.</p>
+                    <p>Первый урок можно создать <strong>бесплатно без регистрации</strong>. Для дальнейшей работы нужен аккаунт — так сохраняется история и результаты тестов.</p>
+                    <p>Материалы ориентированы на программу обучения в России. После урока пройдите квиз — он покажет, насколько хорошо вы усвоили тему.</p>
+                </div>
+            </details>
+
+            <details class="faq-item glass rounded-xl p-5 group">
+                <summary class="font-semibold text-theme-primary cursor-pointer list-none flex items-center justify-between">
+                    Для родителей
+                    <span class="text-theme-muted text-lg group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <div class="mt-4 text-sm text-theme-secondary leading-relaxed space-y-3">
+                    <p>Сервис помогает объяснить ребёнку сложную тему дома: готовый материал по школьной программе, понятный язык, наглядные иллюстрации и проверка через квиз.</p>
+                    <p>Зарегистрируйтесь как <strong>«Родитель»</strong> — в личном кабинете будет видна история уроков и результаты самопроверки.</p>
+                    <p>УмБаза не заменяет учителя, но экономит время при подготовке к контрольным и домашним заданиям.</p>
+                </div>
+            </details>
+
+            <details class="faq-item glass rounded-xl p-5 group">
+                <summary class="font-semibold text-theme-primary cursor-pointer list-none flex items-center justify-between">
+                    Для преподавателей
+                    <span class="text-theme-muted text-lg group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <div class="mt-4 text-sm text-theme-secondary leading-relaxed space-y-3">
+                    <p>Используйте УмБазу как основу для урока: черновик текста, иллюстрации и вопросы для самопроверки — за минуту.</p>
+                    <p>Выберите класс и предмет, укажите тему по программе — AI сгенерирует структурированный материал. Доработайте его под свой стиль и уровень класса.</p>
+                    <p>При регистрации выберите роль <strong>«Преподаватель»</strong> — в кабинете будет статистика по пройденным материалам.</p>
+                </div>
+            </details>
+
+            <details class="faq-item glass rounded-xl p-5 group">
+                <summary class="font-semibold text-theme-primary cursor-pointer list-none flex items-center justify-between">
+                    Ценность сервиса
+                    <span class="text-theme-muted text-lg group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <div class="mt-4 text-sm text-theme-secondary leading-relaxed space-y-3">
+                    <p><strong class="text-theme-primary">УмБаза</strong> — бесплатный AI-генератор уроков для школьников, студентов и курсов дополнительного образования.</p>
+                    <p>Мы делаем знания доступными: быстро, по программе, с наглядными материалами и проверкой понимания. Один сервис — для ученика, родителя и учителя.</p>
+                    <p>Материалы формируются с учётом стандартов Министерства образования Российской Федерации. Сервис развивается — скоро появится премиум-доступ с расширенными возможностями.</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-4 text-sm">
+            <a href="https://vk.com/umbaza" data-link-vk target="_blank" class="text-accent-blue hover:underline">ВКонтакте</a>
+            <a href="https://max.ru/umbaza" data-link-max target="_blank" class="text-accent-blue hover:underline">MAX</a>
+        </div>
+    </main>
+
+    <footer class="border-t border-theme mt-12 py-6 text-center text-xs text-theme-muted">
+        © УмБаза
+    </footer>
+
+    <script src="js/site-config.js"></script>
+</body>
+</html>

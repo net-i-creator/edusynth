@@ -1,12 +1,14 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
+from typing import Literal
 
 
 class UserRegister(BaseModel):
     email: str
     password: str
     full_name: str | None = None
+    role: Literal["student", "parent", "teacher"] = "student"
 
 
 class UserLogin(BaseModel):
@@ -18,6 +20,7 @@ class UserResponse(BaseModel):
     id: UUID
     email: str
     full_name: str | None
+    role: str
     subscription_status: str
     created_at: datetime
 

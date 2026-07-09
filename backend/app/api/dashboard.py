@@ -55,6 +55,7 @@ async def get_dashboard_stats(
         "completed": completed,
         "average_score": average_score,
         "subject_breakdown": subject_stats,
+        "role": user.role,
         "subscription": {
             "status": user.subscription_status,
             "expires_at": user.subscription_expires_at.isoformat() if user.subscription_expires_at else None,

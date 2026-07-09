@@ -2,7 +2,7 @@
  * УмБаза API Client
  */
 
-const API_BASE = window.location.hostname === 'localhost'
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8001'
     : window.location.origin;
 
@@ -26,27 +26,32 @@ class ApiClient {
         localStorage.removeItem('user');
     }
 
-    async request(endpoint, options = {}) {
-        const url = `${this.baseUrl}${endpoint}`;
+    _headers(extra = {}) {
         const headers = {
             'Content-Type': 'application/json',
-            ...options.headers,
+            ...extra,
         };
-
         const token = this.getToken();
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
+        } else if (typeof getGuestId === 'function') {
+            headers['X-Guest-Id'] = getGuestId();
         }
+        return headers;
+    }
+
+    async request(endpoint, options = {}) {
+        const url = `${this.baseUrl}${endpoint}`;
+        const headers = this._headers(options.headers);
 
         try {
             const response = await fetch(url, { ...options, headers });
 
             if (response.status === 401) {
-                // Try refresh
                 const refreshed = await this.refreshToken();
                 if (refreshed) {
-                    headers['Authorization'] = `Bearer ${this.getToken()}`;
-                    const retryResponse = await fetch(url, { ...options, headers });
+                    const retryHeaders = this._headers(options.headers);
+                    const retryResponse = await fetch(url, { ...options, headers: retryHeaders });
                     return this.handleResponse(retryResponse);
                 }
                 this.clearTokens();
@@ -63,7 +68,12 @@ class ApiClient {
     async handleResponse(response) {
         if (!response.ok) {
             const error = await response.json().catch(() => ({ detail: 'Network error' }));
-            throw new Error(error.detail || 'Request failed');
+            const message = typeof error.detail === 'string'
+                ? error.detail
+                : Array.isArray(error.detail)
+                    ? error.detail.map(e => e.msg).join(', ')
+                    : 'Request failed';
+            throw new Error(message);
         }
         return response.json();
     }
@@ -91,11 +101,10 @@ class ApiClient {
         return false;
     }
 
-    // Auth endpoints
-    async register(email, password, fullName) {
+    async register(email, password, fullName, role = 'student') {
         return this.request('/api/auth/register', {
             method: 'POST',
-            body: JSON.stringify({ email, password, full_name: fullName }),
+            body: JSON.stringify({ email, password, full_name: fullName, role }),
         });
     }
 
@@ -110,11 +119,15 @@ class ApiClient {
         return this.request('/api/auth/me');
     }
 
-    // Lesson endpoints
-    async generateLesson(topic, grade, subject) {
+    async generateLesson(topic, grade, subject, educationLevel = 'school') {
         return this.request('/api/lessons/generate', {
             method: 'POST',
-            body: JSON.stringify({ topic, grade: parseInt(grade), subject }),
+            body: JSON.stringify({
+                topic,
+                grade: parseInt(grade, 10),
+                subject,
+                education_level: educationLevel,
+            }),
         });
     }
 
@@ -126,7 +139,6 @@ class ApiClient {
         return this.request('/api/lessons/history/');
     }
 
-    // Quiz endpoints
     async checkQuiz(lessonId, answers) {
         return this.request('/api/quiz/check', {
             method: 'POST',
@@ -134,11 +146,9 @@ class ApiClient {
         });
     }
 
-    // Dashboard
     async getDashboardStats() {
         return this.request('/api/dashboard/stats');
     }
 }
 
-// Global instance
 const api = new ApiClient();

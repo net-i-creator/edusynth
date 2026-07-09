@@ -9,3 +9,18 @@
   from = "/lesson"
   to = "/lesson.html"
   status = 200
+
+[[redirects]]
+  from = "/auth"
+  to = "/auth.html"
+  status = 200
+
+[[redirects]]
+  from = "/account"
+  to = "/account.html"
+  status = 200
+
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200

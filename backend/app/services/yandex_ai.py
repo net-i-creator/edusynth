@@ -8,6 +8,7 @@ import httpx
 
 from app.config import get_settings
 from app.schemas.lesson import LessonContent, QuizQuestion
+from app.services.education_levels import build_lesson_user_prompt, get_system_prompt
 
 settings = get_settings()
 logger = logging.getLogger(__name__)
@@ -103,16 +104,20 @@ def parse_ai_json(text: str, topic: str) -> LessonContent:
     )
 
 
-async def generate_lesson_text_groq(topic: str, grade: int, subject: str) -> LessonContent:
+async def generate_lesson_text_groq(
+    topic: str,
+    grade: int,
+    subject: str,
+    education_level: str = "school",
+    grade_label: str | None = None,
+) -> LessonContent:
     """Generate lesson using Groq API (OpenAI-compatible)."""
     if not settings.groq_api_key:
         raise ValueError("Groq API key не настроен. Добавьте GROQ_API_KEY в файл .env")
 
-    user_prompt = (
-        f"Создай урок по теме «{topic}» для {grade} класса по предмету «{subject}».\n"
-        f"Уровень сложности должен соответствовать возрасту учеников {grade} класса.\n"
-        f"Отвечай ТОЛЬКО валидным JSON."
-    )
+    label = grade_label or f"{grade} класс"
+    user_prompt = build_lesson_user_prompt(topic, subject, education_level, grade, label)
+    system_prompt = get_system_prompt(education_level)
 
     headers = {
         "Authorization": f"Bearer {settings.groq_api_key}",
@@ -122,7 +127,7 @@ async def generate_lesson_text_groq(topic: str, grade: int, subject: str) -> Les
     body = {
         "model": settings.groq_model,
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.7,
@@ -140,7 +145,13 @@ async def generate_lesson_text_groq(topic: str, grade: int, subject: str) -> Les
     return parse_ai_json(text, topic)
 
 
-async def generate_lesson_text_yandex(topic: str, grade: int, subject: str) -> LessonContent:
+async def generate_lesson_text_yandex(
+    topic: str,
+    grade: int,
+    subject: str,
+    education_level: str = "school",
+    grade_label: str | None = None,
+) -> LessonContent:
     """Generate lesson using YandexGPT API."""
     if not settings.yandex_api_key or not settings.yandex_folder_id:
         raise ValueError(
@@ -148,10 +159,9 @@ async def generate_lesson_text_yandex(topic: str, grade: int, subject: str) -> L
             "Добавьте YANDEX_API_KEY и YANDEX_FOLDER_ID в файл .env"
         )
 
-    user_prompt = (
-        f"Создай урок по теме «{topic}» для {grade} класса по предмету «{subject}».\n"
-        f"Уровень сложности должен соответствовать возрасту учеников {grade} класса."
-    )
+    label = grade_label or f"{grade} класс"
+    user_prompt = build_lesson_user_prompt(topic, subject, education_level, grade, label)
+    system_prompt = get_system_prompt(education_level)
 
     headers = {
         "Authorization": f"Api-Key {settings.yandex_api_key}",
@@ -166,7 +176,7 @@ async def generate_lesson_text_yandex(topic: str, grade: int, subject: str) -> L
             "maxTokens": str(settings.yandex_gpt_max_tokens),
         },
         "messages": [
-            {"role": "system", "text": SYSTEM_PROMPT},
+            {"role": "system", "text": system_prompt},
             {"role": "user", "text": user_prompt},
         ],
     }
@@ -181,15 +191,22 @@ async def generate_lesson_text_yandex(topic: str, grade: int, subject: str) -> L
     return parse_ai_json(text, topic)
 
 
-async def generate_lesson_text(topic: str, grade: int, subject: str) -> LessonContent:
+async def generate_lesson_text(
+    topic: str,
+    grade: int,
+    subject: str,
+    education_level: str = "school",
+    grade_label: str | None = None,
+) -> LessonContent:
     """Route to the configured AI provider."""
     provider = settings.ai_provider.lower()
+    label = grade_label or f"{grade}"
     if provider == "groq":
-        logger.info(f"Generating lesson via Groq: {topic} ({grade} класс, {subject})")
-        return await generate_lesson_text_groq(topic, grade, subject)
+        logger.info(f"Generating lesson via Groq: {topic} ({education_level}, {label}, {subject})")
+        return await generate_lesson_text_groq(topic, grade, subject, education_level, grade_label)
     else:
-        logger.info(f"Generating lesson via YandexGPT: {topic} ({grade} класс, {subject})")
-        return await generate_lesson_text_yandex(topic, grade, subject)
+        logger.info(f"Generating lesson via YandexGPT: {topic} ({education_level}, {label}, {subject})")
+        return await generate_lesson_text_yandex(topic, grade, subject, education_level, grade_label)
 
 
 IMAGE_QUERY_SYSTEM_PROMPT = """Ты составляешь поисковые запросы для поиска НАГЛЯДНЫХ ИЛЛЮСТРАЦИЙ к школьному уроку.

@@ -37,7 +37,13 @@ def decode_token(token: str) -> dict:
     return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
 
 
-async def register_user(db: AsyncSession, email: str, password: str, full_name: str | None = None) -> User:
+async def register_user(
+    db: AsyncSession,
+    email: str,
+    password: str,
+    full_name: str | None = None,
+    role: str = "student",
+) -> User:
     existing = await db.execute(select(User).where(User.email == email))
     if existing.scalar_one_or_none():
         raise ValueError("Email already registered")
@@ -46,6 +52,7 @@ async def register_user(db: AsyncSession, email: str, password: str, full_name: 
         email=email,
         password_hash=hash_password(password),
         full_name=full_name,
+        role=role,
     )
     db.add(user)
     await db.commit()

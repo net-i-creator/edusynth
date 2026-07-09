@@ -21,6 +21,11 @@ class User(Base):
         server_default="free",
     )
     subscription_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    role: Mapped[str] = mapped_column(
+        SAEnum("student", "parent", "teacher", name="user_role"),
+        default="student",
+        server_default="student",
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     progress: Mapped[list["UserLessonProgress"]] = relationship(back_populates="user")

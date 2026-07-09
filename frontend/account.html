@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет — УмБаза</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { accent: { cyan: '#0099ff', blue: '#2563eb', violet: '#7c3aed' } } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <nav class="relative z-10 border-b border-theme glass">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
+                    <span class="text-accent-blue font-bold text-xs">У</span>
+                </div>
+                <span class="font-bold text-theme-primary">УмБаза</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="faq.html" class="nav-link text-sm">FAQ</a>
+                <button onclick="logout()" class="text-sm text-theme-muted hover:text-red-500">Выйти</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-10">
+        <div class="flex items-start justify-between flex-wrap gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-theme-primary mb-1">Личный кабинет</h1>
+                <p class="text-theme-muted text-sm" id="user-greeting">Загрузка...</p>
+            </div>
+            <span id="user-role-badge" class="level-selected-label"></span>
+        </div>
+
+        <div id="role-hint" class="glass rounded-xl p-4 mb-8 text-sm text-theme-secondary hidden"></div>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-8">
+            <div class="glass rounded-xl p-5 text-center">
+                <div class="text-2xl font-bold text-accent-blue" id="stat-lessons">—</div>
+                <div class="text-xs text-theme-muted mt-1">Уроков пройдено</div>
+            </div>
+            <div class="glass rounded-xl p-5 text-center">
+                <div class="text-2xl font-bold text-accent-violet" id="stat-quizzes">—</div>
+                <div class="text-xs text-theme-muted mt-1">Квизов завершено</div>
+            </div>
+            <div class="glass rounded-xl p-5 text-center">
+                <div class="text-2xl font-bold text-green-600" id="stat-score">—</div>
+                <div class="text-xs text-theme-muted mt-1">Средний балл</div>
+            </div>
+        </div>
+
+        <div id="subject-breakdown" class="glass rounded-xl p-5 mb-8 hidden">
+            <h2 class="font-semibold text-theme-primary mb-3 text-sm">По предметам</h2>
+            <div id="subject-list" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="glass-strong rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h2 class="font-semibold text-theme-primary">Премиум доступ</h2>
+                    <p class="text-sm text-theme-muted mt-1" id="subscription-status">Бесплатный тариф</p>
+                </div>
+                <button class="btn-primary px-6 py-2.5 text-sm opacity-60 cursor-not-allowed" disabled>
+                    Скоро
+                </button>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6">
+            <h2 class="font-semibold text-theme-primary mb-4">История уроков</h2>
+            <div id="lesson-history" class="space-y-2 text-sm text-theme-muted">Загрузка...</div>
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="/" class="btn-primary inline-block px-6 py-2.5 text-sm">Создать новый урок</a>
+        </div>
+    </main>
+
+    <script src="js/site-config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const ROLE_HINTS = {
+            student: 'Здесь вы видите свои уроки, результаты квизов и прогресс по предметам.',
+            parent: 'Отслеживайте материалы, которые проходят ваши дети, и повторяйте темы дома.',
+            teacher: 'Используйте сгенерированные уроки как основу — дорабатывайте под свой класс.',
+        };
+
+        function formatLessonMeta(l) {
+            const level = EDUCATION_LEVEL_LABELS[l.education_level] || '';
+            const grade = l.grade_label || `${l.grade} кл.`;
+            return `${level} · ${l.subject} · ${grade}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!requireAuth()) return;
+
+            let user = getUser();
+            if (!user) {
+                try {
+                    user = await api.getMe();
+                    setUser(user);
+                } catch (e) { /* ignore */ }
+            }
+
+            const name = user?.full_name || user?.email || '';
+            const role = user?.role || 'student';
+            document.getElementById('user-greeting').textContent = name;
+            document.getElementById('user-role-badge').textContent = ROLE_LABELS[role] || role;
+
+            const hint = document.getElementById('role-hint');
+            hint.textContent = ROLE_HINTS[role] || '';
+            hint.classList.remove('hidden');
+
+            try {
+                const stats = await api.getDashboardStats();
+                if (stats) {
+                    document.getElementById('stat-lessons').textContent = stats.total_lessons ?? 0;
+                    document.getElementById('stat-quizzes').textContent = stats.completed ?? 0;
+                    document.getElementById('stat-score').textContent =
+                        stats.average_score ? `${stats.average_score}%` : '—';
+
+                    if (stats.subscription?.status === 'premium') {
+                        document.getElementById('subscription-status').textContent = 'Премиум активен';
+                    }
+
+                    const breakdown = stats.subject_breakdown || {};
+                    const keys = Object.keys(breakdown);
+                    if (keys.length) {
+                        document.getElementById('subject-breakdown').classList.remove('hidden');
+                        document.getElementById('subject-list').innerHTML = keys.map(s =>
+                            `<span class="px-3 py-1 rounded-full text-xs bg-blue-50 text-accent-blue border border-blue-100">${s}: ${breakdown[s]}</span>`
+                        ).join('');
+                    }
+                }
+            } catch (e) {
+                document.getElementById('stat-lessons').textContent = '0';
+                document.getElementById('stat-quizzes').textContent = '0';
+                document.getElementById('stat-score').textContent = '—';
+            }
+
+            try {
+                const history = await api.getLessonHistory();
+                const el = document.getElementById('lesson-history');
+                if (!history || history.length === 0) {
+                    el.innerHTML = '<p>Уроков пока нет. <a href="/" class="text-accent-blue">Создайте первый</a></p>';
+                    return;
+                }
+                el.innerHTML = history.map(l => `
+                    <a href="lesson.html?id=${l.id}" class="block p-3 rounded-lg hover:bg-blue-50/50 transition-colors border border-transparent hover:border-blue-100">
+                        <div class="font-medium text-theme-primary">${l.topic}</div>
+                        <div class="text-theme-muted text-xs mt-0.5">${formatLessonMeta(l)}</div>
+                        ${l.score != null ? `<div class="text-xs text-green-600 mt-1">Квиз: ${l.score}%</div>` : ''}
+                    </a>
+                `).join('');
+            } catch (e) {
+                document.getElementById('lesson-history').innerHTML =
+                    '<p>История появится после создания уроков</p>';
+            }
+        });
+    </script>
+</body>
+</html>
