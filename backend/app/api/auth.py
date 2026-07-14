@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
-from app.schemas.auth import UserRegister, UserLogin, UserResponse, TokenResponse, TokenRefresh
+from app.schemas.auth import UserRegister, UserLogin, UserResponse, TokenResponse, TokenRefresh, UserProfileUpdate
 from app.services.auth import register_user, authenticate_user, create_access_token, create_refresh_token, decode_token, get_user_by_id
 from app.api.deps import get_current_user
 from app.models.user import User
@@ -15,7 +15,9 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserRegister, db: Annotated[AsyncSession, Depends(get_db)]):
     try:
-        user = await register_user(db, data.email, data.password, data.full_name, data.role)
+        user = await register_user(
+            db, data.email, data.password, data.full_name, data.phone, data.role
+        )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
@@ -56,4 +58,24 @@ async def refresh(data: TokenRefresh):
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(user: Annotated[User, Depends(get_current_user)]):
+    return user
+
+
+@router.patch("/me", response_model=UserResponse)
+async def update_me(
+    data: UserProfileUpdate,
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    if data.full_name is not None:
+        user.full_name = data.full_name or None
+    if data.phone is not None:
+        user.phone = data.phone or None
+    if data.parent_name is not None:
+        user.parent_name = data.parent_name or None
+    if data.parent_phone is not None:
+        user.parent_phone = data.parent_phone or None
+
+    await db.commit()
+    await db.refresh(user)
     return user

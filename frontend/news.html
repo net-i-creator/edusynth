@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новости — УмБаза</title>
+    <meta name="description" content="Статьи об обучении с AI, подготовке к экзаменам и цифровом образовании от команды УмБаза">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { accent: { cyan: '#0099ff', blue: '#2563eb', violet: '#7c3aed' } } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/yandex-metrika.js"></script>
+</head>
+<body class="font-sans antialiased min-h-screen">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110566914" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+    <nav class="relative z-10 border-b border-theme glass">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
+            <a href="/" class="flex items-center gap-2 shrink-0">
+                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
+                    <span class="text-accent-blue font-bold text-xs">У</span>
+                </div>
+                <span class="font-bold text-theme-primary">УмБаза</span>
+            </a>
+            <div class="flex items-center gap-4 text-sm">
+                <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="/" class="text-theme-muted hover:text-accent-blue">← На главную</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-10 md:py-14">
+        <div class="mb-10">
+            <p class="text-xs font-semibold uppercase tracking-widest text-accent-blue mb-2">Блог</p>
+            <h1 class="text-3xl font-bold text-theme-primary mb-2">Новости и статьи</h1>
+            <p class="text-theme-secondary">Материалы об обучении с AI, подготовке к урокам и цифровом образовании</p>
+        </div>
+
+        <div class="space-y-5" id="news-list">
+            <article class="news-card glass rounded-2xl p-6">
+                <time class="text-xs text-theme-muted" datetime="2026-07-10">10 июля 2026</time>
+                <h2 class="text-xl font-bold text-theme-primary mt-2 mb-2">
+                    <a href="news/ai-uroki-dlya-shkoly.html" class="hover:text-accent-blue transition-colors">Как AI помогает создавать школьные уроки за минуту</a>
+                </h2>
+                <p class="text-sm text-theme-secondary leading-relaxed mb-4">Разбираем, как нейросеть собирает текст, иллюстрации и квиз под тему, класс и предмет — и почему это экономит время ученикам и родителям.</p>
+                <a href="news/ai-uroki-dlya-shkoly.html" class="text-sm font-semibold text-accent-blue hover:underline">Читать →</a>
+            </article>
+
+            <article class="news-card glass rounded-2xl p-6">
+                <time class="text-xs text-theme-muted" datetime="2026-07-05">5 июля 2026</time>
+                <h2 class="text-xl font-bold text-theme-primary mt-2 mb-2">
+                    <a href="news/podgotovka-k-ekzamenam.html" class="hover:text-accent-blue transition-colors">Подготовка к контрольным и экзаменам с персональными уроками</a>
+                </h2>
+                <p class="text-sm text-theme-secondary leading-relaxed mb-4">Пять практических советов: как повторять сложные темы, проверять себя квизом и не терять мотивацию перед проверкой знаний.</p>
+                <a href="news/podgotovka-k-ekzamenam.html" class="text-sm font-semibold text-accent-blue hover:underline">Читать →</a>
+            </article>
+
+            <article class="news-card glass rounded-2xl p-6">
+                <time class="text-xs text-theme-muted" datetime="2026-06-28">28 июня 2026</time>
+                <h2 class="text-xl font-bold text-theme-primary mt-2 mb-2">
+                    <a href="news/roditelyam-i-uchitelyam.html" class="hover:text-accent-blue transition-colors">УмБаза для родителей и преподавателей: кому и зачем</a>
+                </h2>
+                <p class="text-sm text-theme-secondary leading-relaxed mb-4">Как сервис помогает родителям контролировать прогресс ребёнка, а учителям — быстро готовить материалы под свой класс.</p>
+                <a href="news/roditelyam-i-uchitelyam.html" class="text-sm font-semibold text-accent-blue hover:underline">Читать →</a>
+            </article>
+        </div>
+    </main>
+
+    <script src="js/site-config.js"></script>
+</body>
+</html>

@@ -101,10 +101,10 @@ class ApiClient {
         return false;
     }
 
-    async register(email, password, fullName, role = 'student') {
+    async register(email, password, fullName, role = 'student', phone = null) {
         return this.request('/api/auth/register', {
             method: 'POST',
-            body: JSON.stringify({ email, password, full_name: fullName, role }),
+            body: JSON.stringify({ email, password, full_name: fullName, role, phone }),
         });
     }
 
@@ -117,6 +117,13 @@ class ApiClient {
 
     async getMe() {
         return this.request('/api/auth/me');
+    }
+
+    async updateProfile(data) {
+        return this.request('/api/auth/me', {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+        });
     }
 
     async generateLesson(topic, grade, subject, educationLevel = 'school') {

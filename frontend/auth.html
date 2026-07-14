@@ -12,8 +12,10 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/yandex-metrika.js"></script>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110566914" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
     <nav class="relative z-10 border-b border-theme">
         <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
@@ -70,6 +72,10 @@
                     <div>
                         <label class="block text-sm font-medium text-theme-secondary mb-1.5">Имя</label>
                         <input type="text" id="reg-name" class="input-glass w-full px-4 py-3 text-sm" placeholder="Иван Иванов">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Телефон</label>
+                        <input type="tel" id="reg-phone" required class="input-glass w-full px-4 py-3 text-sm" placeholder="+7 (999) 123-45-67" autocomplete="tel">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-theme-secondary mb-1.5">Email</label>
@@ -145,7 +151,8 @@
                     document.getElementById('reg-email').value,
                     document.getElementById('reg-password').value,
                     document.getElementById('reg-name').value || null,
-                    role
+                    role,
+                    document.getElementById('reg-phone').value
                 );
                 api.setTokens(data.access_token, data.refresh_token);
                 const user = await api.getMe();

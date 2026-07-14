@@ -12,8 +12,10 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/yandex-metrika.js"></script>
 </head>
 <body class="font-sans antialiased min-h-screen">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110566914" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
     <nav class="relative z-10 border-b border-theme glass">
         <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -25,6 +27,7 @@
             </a>
             <div class="flex items-center gap-4">
                 <a href="faq.html" class="nav-link text-sm">FAQ</a>
+                <a href="news.html" class="nav-link text-sm">Новости</a>
                 <button onclick="logout()" class="text-sm text-theme-muted hover:text-red-500">Выйти</button>
             </div>
         </div>
@@ -59,6 +62,23 @@
         <div id="subject-breakdown" class="glass rounded-xl p-5 mb-8 hidden">
             <h2 class="font-semibold text-theme-primary mb-3 text-sm">По предметам</h2>
             <div id="subject-list" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="parent-section" class="glass-strong rounded-2xl p-6 mb-8 hidden">
+            <h2 class="font-semibold text-theme-primary mb-1">Контакты родителя</h2>
+            <p class="text-sm text-theme-muted mb-4">Укажите данные родителя или законного представителя</p>
+            <form id="parent-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-theme-secondary mb-1.5">ФИО родителя</label>
+                    <input type="text" id="parent-name" class="input-glass w-full px-4 py-3 text-sm" placeholder="Иванова Мария Петровна">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-theme-secondary mb-1.5">Телефон родителя</label>
+                    <input type="tel" id="parent-phone" class="input-glass w-full px-4 py-3 text-sm" placeholder="+7 (999) 123-45-67" autocomplete="tel">
+                </div>
+                <button type="submit" class="btn-primary px-6 py-2.5 text-sm">Сохранить</button>
+                <p id="parent-save-status" class="text-sm text-theme-muted hidden"></p>
+            </form>
         </div>
 
         <div class="glass-strong rounded-2xl p-6 mb-8">
@@ -118,6 +138,31 @@
             const hint = document.getElementById('role-hint');
             hint.textContent = ROLE_HINTS[role] || '';
             hint.classList.remove('hidden');
+
+            if (role === 'student') {
+                document.getElementById('parent-section').classList.remove('hidden');
+                document.getElementById('parent-name').value = user?.parent_name || '';
+                document.getElementById('parent-phone').value = user?.parent_phone || '';
+            }
+
+            document.getElementById('parent-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const status = document.getElementById('parent-save-status');
+                try {
+                    const updated = await api.updateProfile({
+                        parent_name: document.getElementById('parent-name').value.trim() || null,
+                        parent_phone: document.getElementById('parent-phone').value.trim() || null,
+                    });
+                    setUser(updated);
+                    status.textContent = 'Сохранено';
+                    status.classList.remove('hidden', 'text-red-500');
+                    status.classList.add('text-green-600');
+                } catch (err) {
+                    status.textContent = err.message || 'Ошибка сохранения';
+                    status.classList.remove('hidden');
+                    status.classList.add('text-red-500');
+                }
+            });
 
             try {
                 const stats = await api.getDashboardStats();

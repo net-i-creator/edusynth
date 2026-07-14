@@ -42,6 +42,7 @@ function requireAuthForGeneration() {
 function onLessonGenerated() {
     if (typeof isLoggedIn === 'function' && isLoggedIn()) return;
     incrementGuestLessonCount();
+    sessionStorage.setItem('show_guest_signup', '1');
 }
 
 function getGuestRemainingText() {
@@ -56,6 +57,15 @@ function handleGuestLimitError(error) {
     if (error && error.message && error.message.includes('Guest limit')) {
         const redirect = encodeURIComponent(window.location.pathname);
         window.location.href = `auth.html?reason=limit&redirect=${redirect}`;
+        return true;
+    }
+    return false;
+}
+
+function handleGenerationAccessError(error) {
+    const message = error?.message || '';
+    if (message.includes('Teacher subscription') || message.includes('Daily lesson limit')) {
+        window.location.href = `account.html?reason=${message.includes('Teacher') ? 'teacher-plan' : 'daily-limit'}`;
         return true;
     }
     return false;

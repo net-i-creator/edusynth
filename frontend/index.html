@@ -29,8 +29,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/yandex-metrika.js"></script>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110566914" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
     <!-- Background: neon spots + glass orbs on edges -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -52,7 +54,7 @@
 
     <!-- NAV -->
     <nav class="relative z-10 border-b border-theme">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
             <div class="flex items-center gap-4 min-w-0">
                 <a href="/" class="flex items-center gap-3 shrink-0">
                     <div class="w-9 h-9 rounded-xl glass-strong flex items-center justify-center">
@@ -61,46 +63,72 @@
                     <span class="font-bold text-lg tracking-tight text-theme-primary hidden sm:inline">УмБаза</span>
                 </a>
                 <a href="faq.html" class="nav-link hidden sm:inline">FAQ</a>
+                <a href="news.html" class="nav-link hidden sm:inline">Новости</a>
+                <a href="#plans" class="nav-link hidden md:inline">Тарифы</a>
             </div>
 
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                 <a href="https://vk.com/umbaza" data-link-vk target="_blank" rel="noopener noreferrer" class="social-icon" title="ВКонтакте" aria-label="ВКонтакте">
-                    <img src="assets/logos/vk.svg" alt="">
+                    <img src="assets/logos/vk.png" alt="ВКонтакте">
                 </a>
                 <a href="https://max.ru/umbaza" data-link-max target="_blank" rel="noopener noreferrer" class="social-icon" title="MAX" aria-label="MAX">
-                    <img src="assets/logos/max.svg" alt="">
+                    <img src="assets/logos/max.png" alt="MAX">
                 </a>
                 <a href="account.html" id="nav-account" class="btn-account">Личный кабинет</a>
             </div>
         </div>
-        <div class="sm:hidden px-6 pb-3 flex justify-center">
+        <div class="sm:hidden px-6 pb-3 flex justify-center gap-4">
             <a href="faq.html" class="nav-link text-sm">FAQ</a>
+            <a href="news.html" class="nav-link text-sm">Новости</a>
         </div>
     </nav>
 
-    <main class="relative z-10 max-w-4xl mx-auto px-6 py-10 md:py-16">
+    <main class="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-20">
 
         <!-- HERO — animated greeting -->
         <section class="text-center mb-14 md:mb-16">
             <div class="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-accent-blue mb-8">
                 <span class="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse"></span>
-                AI-генератор уроков
+                Персональное обучение с AI
             </div>
             <div class="hero-greeting greeting-hero mb-4">
                 <h1 id="greeting-text" class="greeting-text" aria-live="polite">Приветствую!</h1>
             </div>
             <p class="text-base text-theme-secondary max-w-lg mx-auto">
-                Выберите уровень образования — и мы подготовим урок с текстом, иллюстрациями и квизом
+                Сложная тема превращается в понятный урок, наглядные примеры и проверку знаний — за одну минуту.
             </p>
         </section>
 
         <!-- ABOUT -->
         <section class="hero-about mb-14 md:mb-16">
-            <div class="glass-strong rounded-2xl p-6 md:p-8">
+            <div class="glass-strong rounded-[2rem] p-6 md:p-10 premium-panel">
                 <p class="text-theme-secondary leading-relaxed text-center max-w-2xl mx-auto">
-                    <strong class="text-theme-primary">УмБаза</strong> — бесплатный сервис для создания уроков с помощью искусственного интеллекта.
-                    Подходит для учеников, учителей и родителей.
+                    <strong class="text-theme-primary">УмБаза</strong> собирает персональный урок под ваш уровень: объясняет тему, показывает её на примерах и проверяет понимание. Первый урок — сразу, без регистрации.
                 </p>
+            </div>
+        </section>
+
+        <section id="plans" class="hero-plans mb-16 md:mb-20">
+            <div class="section-heading">
+                <span>Прозрачные условия</span>
+                <h2>Начните бесплатно. Подключайте больше, когда понадобится.</h2>
+            </div>
+            <div class="plan-grid">
+                <article class="plan-card glass">
+                    <div class="plan-kicker">Гость</div><h3>1 урок</h3>
+                    <p>Без регистрации и банковской карты. Попробуйте сервис сразу.</p>
+                    <a href="#levels-section" class="plan-link">Создать урок →</a>
+                </article>
+                <article class="plan-card glass plan-featured">
+                    <div class="plan-kicker">Ученик</div><h3>3 урока в день</h3>
+                    <p>Бесплатный кабинет, история занятий и результаты квизов.</p>
+                    <a href="auth.html?mode=register" class="plan-link">Зарегистрироваться →</a>
+                </article>
+                <article class="plan-card glass">
+                    <div class="plan-kicker">Родитель и педагог</div><h3>Расширенный доступ</h3>
+                    <p>Статистика ребёнка, недельные отчёты и инструменты преподавателя — по подписке.</p>
+                    <button onclick="openPaymentModal()" class="plan-link">Посмотреть планы →</button>
+                </article>
             </div>
         </section>
 
@@ -220,25 +248,31 @@
 
     <!-- FOOTER -->
     <footer class="site-footer relative z-10 border-t border-theme mt-12">
-        <div class="max-w-4xl mx-auto px-6 py-10">
+        <div class="max-w-6xl mx-auto px-6 py-10">
             <div class="footer-grid">
                 <!-- Left: Ministry -->
                 <div class="footer-ministry">
                     <img src="assets/minobr-emblem.png" alt="Герб Российской Федерации" width="40" height="40">
-                    <p>Все уроки формируются в соответствии со стандартами <strong>Министерства образования Российской Федерации</strong></p>
+                    <p>Материалы формируются с учётом <strong>ФГОС Российской Федерации</strong>. AI может допускать неточности — проверяйте важные факты.</p>
                 </div>
 
                 <!-- Center: Payment partners -->
                 <div class="footer-partners">
-                    <img src="assets/logos/sbp.svg" alt="СБП" title="Система быстрых платежей">
-                    <img src="assets/logos/tbank.svg" alt="Т-Банк" title="Т-Банк">
-                    <img src="assets/logos/yookassa.svg" alt="ЮKassa" title="ЮKassa">
+                    <a href="https://yookassa.ru/" data-link-yookassa target="_blank" rel="noopener noreferrer" class="footer-partner-link">
+                        <img src="assets/logos/yookassa.png" alt="ЮKassa" title="ЮKassa">
+                    </a>
+                    <a href="https://sbp.nspk.ru/" data-link-sbp target="_blank" rel="noopener noreferrer" class="footer-partner-link">
+                        <img src="assets/logos/sbp.png" alt="СБП" title="Система быстрых платежей">
+                    </a>
+                    <a href="https://tochka.com/" data-link-tochka target="_blank" rel="noopener noreferrer" class="footer-partner-link">
+                        <img src="assets/logos/tochka.png" alt="Точка Банк" title="Банк «Точка»">
+                    </a>
                 </div>
 
                 <!-- Right: SBP payment -->
                 <div class="footer-payment">
                     <button type="button" class="btn-sbp" onclick="openPaymentModal()">
-                        <img src="assets/logos/sbp.svg" alt="">
+                        <img src="assets/logos/sbp.png" alt="СБП">
                         Оплата через СБП
                     </button>
                     <span class="text-xs text-theme-muted">Премиум — скоро</span>
@@ -247,6 +281,12 @@
 
             <div class="flex flex-wrap items-center justify-center gap-4 mt-8 pt-6 border-t border-theme">
                 <a href="faq.html" class="text-xs text-theme-muted hover:text-accent-blue">FAQ</a>
+                <span class="text-theme-muted">·</span>
+                <a href="news.html" class="text-xs text-theme-muted hover:text-accent-blue">Новости</a>
+                <span class="text-theme-muted">·</span>
+                <button type="button" onclick="openSupport()" class="text-xs text-theme-muted hover:text-accent-blue">Служба поддержки</button>
+                <span class="text-theme-muted">·</span>
+                <a href="https://handyhost.ru/policy.html" target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">Политика обработки данных</a>
                 <span class="text-theme-muted">·</span>
                 <a href="https://vk.com/umbaza" data-link-vk target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">ВКонтакте</a>
                 <span class="text-theme-muted">·</span>
@@ -262,11 +302,29 @@
         </div>
     </footer>
 
+    <button class="support-fab" type="button" onclick="openSupport()" aria-label="Открыть службу поддержки">
+        <span>?</span><em>Помощь</em>
+    </button>
+
+    <div id="support-modal" class="payment-modal" onclick="closeSupport(event)">
+        <div class="payment-modal-card support-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeSupport()" aria-label="Закрыть">×</button>
+            <div class="plan-kicker">Поддержка УмБазы</div>
+            <h3 class="text-xl font-semibold text-theme-primary mb-2">Чем можем помочь?</h3>
+            <p class="text-sm text-theme-secondary mb-5">Опишите вопрос — черновик сохранится, затем откроется чат поддержки ВКонтакте.</p>
+            <label class="block text-sm font-medium text-theme-secondary mb-1.5">Ваш email</label>
+            <input id="support-email" type="email" class="input-glass w-full px-4 py-3 text-sm mb-3" placeholder="you@example.com">
+            <label class="block text-sm font-medium text-theme-secondary mb-1.5">Сообщение</label>
+            <textarea id="support-message" class="input-glass w-full px-4 py-3 text-sm mb-4" rows="4" placeholder="Расскажите, что произошло"></textarea>
+            <button class="btn-primary w-full py-3 text-sm" onclick="sendSupport()">Отправить обращение</button>
+        </div>
+    </div>
+
     <!-- Payment modal (placeholder) -->
     <div id="payment-modal" class="payment-modal" onclick="closePaymentModal(event)">
         <div class="payment-modal-card" onclick="event.stopPropagation()">
             <h3 class="font-semibold text-theme-primary mb-2">Оплата через СБП</h3>
-            <p class="text-sm text-theme-secondary mb-4">Раздел в разработке. Здесь будет оплата премиум-доступа через Систему быстрых платежей.</p>
+                <p class="text-sm text-theme-secondary mb-4">Подписки готовятся к запуску: ученик — безлимитные уроки, родитель — статистика ребёнка и недельные отчёты, преподаватель — профессиональный тариф.</p>
             <button type="button" class="btn-primary w-full py-2.5 text-sm" onclick="closePaymentModal()">Понятно</button>
         </div>
     </div>
@@ -314,6 +372,20 @@
         function closePaymentModal(e) {
             if (e && e.target !== e.currentTarget) return;
             document.getElementById('payment-modal').classList.remove('active');
+        }
+        function openSupport() { document.getElementById('support-modal').classList.add('active'); }
+        function closeSupport(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('support-modal').classList.remove('active');
+        }
+        function sendSupport() {
+            const email = document.getElementById('support-email').value.trim();
+            const message = document.getElementById('support-message').value.trim();
+            if (!email || !message) return showToast('Заполните email и сообщение', 'error');
+            localStorage.setItem('support_draft', JSON.stringify({ email, message, createdAt: new Date().toISOString() }));
+            closeSupport();
+            showToast('Черновик сохранён. Открываем чат поддержки.', 'success');
+            window.open(SITE_CONFIG.social.vk, '_blank', 'noopener');
         }
         function selectLevel(level) {
             const config = EDUCATION_LEVELS[level];
@@ -366,7 +438,7 @@
                 localStorage.setItem('current_lesson', JSON.stringify(lesson));
                 window.location.href = `lesson.html?id=${lesson.id}`;
             } catch (error) {
-                if (handleGuestLimitError(error)) return;
+                if (handleGuestLimitError(error) || handleGenerationAccessError(error)) return;
                 document.getElementById('loading-section').classList.add('hidden');
                 document.getElementById('error-section').classList.remove('hidden');
                 const msg = error.message || 'Попробуйте ещё раз';

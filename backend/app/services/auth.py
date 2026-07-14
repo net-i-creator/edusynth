@@ -42,6 +42,7 @@ async def register_user(
     email: str,
     password: str,
     full_name: str | None = None,
+    phone: str | None = None,
     role: str = "student",
 ) -> User:
     existing = await db.execute(select(User).where(User.email == email))
@@ -52,6 +53,7 @@ async def register_user(
         email=email,
         password_hash=hash_password(password),
         full_name=full_name,
+        phone=phone,
         role=role,
     )
     db.add(user)

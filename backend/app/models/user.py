@@ -15,6 +15,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    parent_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    parent_phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
     subscription_status: Mapped[str] = mapped_column(
         SAEnum("free", "premium", name="subscription_status"),
         default="free",

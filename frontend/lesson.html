@@ -32,8 +32,10 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/yandex-metrika.js"></script>
 </head>
 <body class="font-sans antialiased min-h-screen">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110566914" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div class="sphere sphere-cyan w-80 h-80 -top-20 -left-20" id="sphere-1"></div>
@@ -132,17 +134,40 @@
         </div>
     </main>
 
+    <div id="guest-signup-modal" class="payment-modal" onclick="closeGuestSignup(event)">
+        <div class="payment-modal-card" onclick="event.stopPropagation()">
+            <div class="plan-kicker">Первый урок готов</div>
+            <h3 class="text-xl font-semibold text-theme-primary mb-2">Продолжим обучение?</h3>
+            <p class="text-sm text-theme-secondary mb-5">Создайте бесплатный кабинет и получайте до трёх персональных уроков в сутки с сохранением прогресса.</p>
+            <a href="auth.html?mode=register&reason=limit&redirect=/" class="btn-primary block w-full py-3 text-sm text-center">Создать кабинет</a>
+            <button onclick="closeGuestSignup()" class="w-full mt-3 text-sm text-theme-muted">Остаться на уроке</button>
+        </div>
+    </div>
+
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
         <img id="lightbox-img" src="" alt="">
     </div>
 
     <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/guest-limit.js"></script>
     <script src="js/animations.js"></script>
     <script>
         let currentLesson = null;
         let selectedAnswers = [];
 
-        document.addEventListener('DOMContentLoaded', loadLesson);
+        function closeGuestSignup(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('guest-signup-modal').classList.remove('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLesson();
+            if (!isLoggedIn() && sessionStorage.getItem('show_guest_signup') === '1') {
+                sessionStorage.removeItem('show_guest_signup');
+                setTimeout(() => document.getElementById('guest-signup-modal').classList.add('active'), 900);
+            }
+        });
 
         async function loadLesson() {
             const params = new URLSearchParams(window.location.search);

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УмБаза для родителей и преподавателей — УмБаза</title>
+    <meta name="description" content="Как УмБаза помогает родителям и учителям: персональные уроки, статистика и материалы для класса">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { colors: { accent: { cyan: '#0099ff', blue: '#2563eb', violet: '#7c3aed' } } } } }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/yandex-metrika.js"></script>
+</head>
+<body class="font-sans antialiased min-h-screen">
+    <nav class="relative z-10 border-b border-theme glass">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="font-bold text-theme-primary">УмБаза</a>
+            <a href="../news.html" class="text-sm text-theme-muted hover:text-accent-blue">← Все новости</a>
+        </div>
+    </nav>
+    <main class="max-w-3xl mx-auto px-6 py-10 md:py-14">
+        <article class="news-article glass-strong rounded-2xl p-6 md:p-10">
+            <time class="text-xs text-theme-muted" datetime="2026-06-28">28 июня 2026</time>
+            <h1 class="text-3xl font-bold text-theme-primary mt-3 mb-6">УмБаза для родителей и преподавателей: кому и зачем</h1>
+            <div class="prose-news text-theme-secondary space-y-4 text-sm leading-relaxed">
+                <p><strong>Родителям</strong> сервис помогает контролировать, какие темы проходит ребёнок, и быстро находить материалы для домашнего повторения. В личном кабинете ученика можно указать контакты родителя.</p>
+                <p><strong>Преподавателям</strong> УмБаза даёт готовую основу урока: текст, иллюстрации и вопросы для проверки. Материал можно адаптировать под свой класс и использовать на уроке или в домашней работе.</p>
+                <p>Выберите роль при <a href="../auth.html?mode=register" class="text-accent-blue hover:underline">регистрации</a> — интерфейс подстроится под ваши задачи.</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

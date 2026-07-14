@@ -3,8 +3,13 @@
  */
 const SITE_CONFIG = {
     social: {
-        vk: 'https://vk.com/umbaza',
-        max: 'https://max.ru/umbaza',
+        vk: 'https://vk.com/UmBazaRF',
+        max: 'https://max.ru/join/S42G2LXAaTZxptGMZhW8WdAO5-JMEpFv10IccQvNNsI',
+    },
+    payments: {
+        yookassa: 'https://yookassa.ru/',
+        sbp: 'https://sbp.nspk.ru/',
+        tochka: 'https://tochka.com/',
     },
     extraLink: {
         label: 'О проекте',
@@ -34,6 +39,15 @@ function applySiteLinks() {
     });
     document.querySelectorAll('[data-link-max]').forEach(el => {
         el.href = SITE_CONFIG.social.max;
+    });
+    document.querySelectorAll('[data-link-yookassa]').forEach(el => {
+        el.href = SITE_CONFIG.payments.yookassa;
+    });
+    document.querySelectorAll('[data-link-sbp]').forEach(el => {
+        el.href = SITE_CONFIG.payments.sbp;
+    });
+    document.querySelectorAll('[data-link-tochka]').forEach(el => {
+        el.href = SITE_CONFIG.payments.tochka;
     });
     const extra = document.getElementById('extra-footer-link');
     if (extra && SITE_CONFIG.extraLink.enabled) {
