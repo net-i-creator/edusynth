@@ -29,3 +29,13 @@
   from = "/faq"
   to = "/faq.html"
   status = 200
+
+[[redirects]]
+  from = "/oferta"
+  to = "/oferta.html"
+  status = 200
+
+[[redirects]]
+  from = "/confidentiality"
+  to = "/confidentiality.html"
+  status = 200

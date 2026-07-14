@@ -53,33 +53,26 @@
     </div>
 
     <!-- NAV -->
-    <nav class="relative z-10 border-b border-theme">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-4 min-w-0">
-                <a href="/" class="flex items-center gap-3 shrink-0">
-                    <div class="w-9 h-9 rounded-xl glass-strong flex items-center justify-center">
-                        <span class="text-accent-blue font-bold text-sm">У</span>
-                    </div>
-                    <span class="font-bold text-lg tracking-tight text-theme-primary hidden sm:inline">УмБаза</span>
-                </a>
-                <a href="faq.html" class="nav-link hidden sm:inline">FAQ</a>
-                <a href="news.html" class="nav-link hidden sm:inline">Новости</a>
-                <a href="#plans" class="nav-link hidden md:inline">Тарифы</a>
+    <nav class="site-nav relative z-10 border-b border-theme">
+        <div class="site-nav__inner max-w-6xl mx-auto px-4 sm:px-6">
+            <a href="/" class="site-nav__brand">
+                <div class="site-nav__logo">
+                    <span class="text-accent-blue font-bold text-sm">У</span>
+                </div>
+                <span class="site-nav__title">УмБаза</span>
+            </a>
+            <div class="site-nav__links">
+                <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="news.html" class="nav-link">Новости</a>
+                <a href="#plans" class="nav-link">Тарифы</a>
             </div>
-
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <a href="https://vk.com/umbaza" data-link-vk target="_blank" rel="noopener noreferrer" class="social-icon" title="ВКонтакте" aria-label="ВКонтакте">
-                    <img src="assets/logos/vk.png" alt="ВКонтакте">
-                </a>
-                <a href="https://max.ru/umbaza" data-link-max target="_blank" rel="noopener noreferrer" class="social-icon" title="MAX" aria-label="MAX">
-                    <img src="assets/logos/max.png" alt="MAX">
-                </a>
-                <a href="account.html" id="nav-account" class="btn-account">Личный кабинет</a>
-            </div>
-        </div>
-        <div class="sm:hidden px-6 pb-3 flex justify-center gap-4">
-            <a href="faq.html" class="nav-link text-sm">FAQ</a>
-            <a href="news.html" class="nav-link text-sm">Новости</a>
+            <a href="https://vk.com/UmBazaRF" data-link-vk target="_blank" rel="noopener noreferrer" class="social-icon social-icon--app site-nav__social-vk" title="ВКонтакте" aria-label="ВКонтакте">
+                <img src="assets/logos/vk-square.png" alt="">
+            </a>
+            <a href="https://max.ru/join/S42G2LXAaTZxptGMZhW8WdAO5-JMEpFv10IccQvNNsI" data-link-max target="_blank" rel="noopener noreferrer" class="social-icon social-icon--app" title="MAX" aria-label="MAX">
+                <img src="assets/logos/max-square.png" alt="">
+            </a>
+            <a href="account.html" id="nav-account" class="btn-account">Войти</a>
         </div>
     </nav>
 
@@ -132,44 +125,53 @@
             </div>
         </section>
 
-        <!-- HOW IT WORKS -->
-        <section class="hero-steps mb-14 md:mb-16">
-            <h2 class="text-sm font-semibold text-theme-muted uppercase tracking-widest text-center mb-8">Как это работает</h2>
-            <div class="grid md:grid-cols-3 gap-4">
-                <div class="step-card glass rounded-xl p-5">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-accent-blue font-bold text-sm mb-3">1</div>
-                    <h3 class="font-semibold mb-1 text-theme-primary">Выберите уровень</h3>
-                    <p class="text-sm text-theme-secondary">Школа, ВУЗ или доп. образование — затем класс и предмет</p>
+        <!-- LEVEL SELECTOR — главный следующий шаг -->
+        <section class="hero-levels mb-10 md:mb-12" id="levels-section">
+            <div class="levels-cta glass-strong rounded-[1.75rem] p-6 md:p-8 max-w-3xl mx-auto">
+                <div class="levels-cta__head text-center mb-6 md:mb-7">
+                    <span class="levels-cta__badge">Начните здесь</span>
+                    <h2 class="levels-cta__title text-xl md:text-2xl font-bold text-theme-primary mt-3 mb-2">Выберите уровень образования</h2>
+                    <p class="text-sm text-theme-secondary max-w-md mx-auto">Школа, ВУЗ или доп. образование — один клик, и можно создать первый урок</p>
                 </div>
-                <div class="step-card glass rounded-xl p-5">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-accent-blue font-bold text-sm mb-3">2</div>
-                    <h3 class="font-semibold mb-1 text-theme-primary">AI создаёт урок</h3>
-                    <p class="text-sm text-theme-secondary">Нейросеть пишет текст и подбирает иллюстрации</p>
-                </div>
-                <div class="step-card glass rounded-xl p-5">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-accent-violet font-bold text-sm mb-3">3</div>
-                    <h3 class="font-semibold mb-1 text-theme-primary">Готовый результат</h3>
-                    <p class="text-sm text-theme-secondary">Текст, картинки и квиз для самопроверки</p>
+                <div class="grid md:grid-cols-3 gap-3 md:gap-4" id="level-buttons">
+                    <button type="button" class="level-btn level-btn--cta" id="level-school" onclick="selectLevel('school')">
+                        <span class="level-btn__mark" aria-hidden="true">Ш</span>
+                        <div class="font-semibold text-base mb-0.5">Школа</div>
+                        <div class="text-xs text-theme-muted">5–11 класс</div>
+                    </button>
+                    <button type="button" class="level-btn level-btn--cta" id="level-university" onclick="selectLevel('university')">
+                        <span class="level-btn__mark" aria-hidden="true">В</span>
+                        <div class="font-semibold text-base mb-0.5">ВУЗ</div>
+                        <div class="text-xs text-theme-muted">Высшее образование</div>
+                    </button>
+                    <button type="button" class="level-btn level-btn--cta" id="level-extra" onclick="selectLevel('extra')">
+                        <span class="level-btn__mark level-btn__mark--violet" aria-hidden="true">+</span>
+                        <div class="font-semibold text-base mb-0.5">Доп. образование</div>
+                        <div class="text-xs text-theme-muted">Курсы и повышение квалификации</div>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- LEVEL SELECTOR -->
-        <section class="hero-levels mb-6" id="levels-section">
-            <h2 class="text-sm font-semibold text-theme-muted uppercase tracking-widest text-center mb-6">Уровень образования</h2>
-            <div class="grid md:grid-cols-3 gap-3">
-                <button type="button" class="level-btn" id="level-school" onclick="selectLevel('school')">
-                    <div class="font-semibold mb-0.5">Школа</div>
-                    <div class="text-xs text-theme-muted">5–11 класс</div>
-                </button>
-                <button type="button" class="level-btn" id="level-university" onclick="selectLevel('university')">
-                    <div class="font-semibold mb-0.5">ВУЗ</div>
-                    <div class="text-xs text-theme-muted">Высшее образование</div>
-                </button>
-                <button type="button" class="level-btn" id="level-extra" onclick="selectLevel('extra')">
-                    <div class="font-semibold mb-0.5">Доп. образование</div>
-                    <div class="text-xs text-theme-muted">Курсы и повышение квалификации</div>
-                </button>
+        <!-- HOW IT WORKS — компактно, после выбора уровня -->
+        <section class="hero-steps hero-steps--compact mb-14 md:mb-16">
+            <h2 class="hero-steps__label text-center mb-4">Как это работает</h2>
+            <div class="grid md:grid-cols-3 gap-2 md:gap-3 max-w-3xl mx-auto">
+                <div class="step-card step-card--compact rounded-xl p-3 md:p-4">
+                    <div class="step-card__num">1</div>
+                    <h3 class="font-medium mb-0.5 text-theme-primary text-sm">Выберите уровень</h3>
+                    <p class="text-xs text-theme-muted leading-snug">Класс и предмет под вашу программу</p>
+                </div>
+                <div class="step-card step-card--compact rounded-xl p-3 md:p-4">
+                    <div class="step-card__num">2</div>
+                    <h3 class="font-medium mb-0.5 text-theme-primary text-sm">AI создаёт урок</h3>
+                    <p class="text-xs text-theme-muted leading-snug">Текст и иллюстрации за минуту</p>
+                </div>
+                <div class="step-card step-card--compact rounded-xl p-3 md:p-4">
+                    <div class="step-card__num step-card__num--violet">3</div>
+                    <h3 class="font-medium mb-0.5 text-theme-primary text-sm">Готовый результат</h3>
+                    <p class="text-xs text-theme-muted leading-snug">Материал и квиз для проверки</p>
+                </div>
             </div>
         </section>
 
@@ -286,7 +288,9 @@
                 <span class="text-theme-muted">·</span>
                 <button type="button" onclick="openSupport()" class="text-xs text-theme-muted hover:text-accent-blue">Служба поддержки</button>
                 <span class="text-theme-muted">·</span>
-                <a href="https://handyhost.ru/policy.html" target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">Политика обработки данных</a>
+                <a href="oferta.html" class="text-xs text-theme-muted hover:text-accent-blue">Оферта</a>
+                <span class="text-theme-muted">·</span>
+                <a href="confidentiality.html" class="text-xs text-theme-muted hover:text-accent-blue">Политика конфиденциальности</a>
                 <span class="text-theme-muted">·</span>
                 <a href="https://vk.com/umbaza" data-link-vk target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">ВКонтакте</a>
                 <span class="text-theme-muted">·</span>
@@ -344,11 +348,12 @@
         function updateNavAccount() {
             const btn = document.getElementById('nav-account');
             if (!btn) return;
+            const compact = window.matchMedia('(max-width: 640px)').matches;
             if (isLoggedIn()) {
-                btn.textContent = 'Кабинет';
+                btn.textContent = compact ? 'Кабинет' : 'Личный кабинет';
                 btn.href = 'account.html';
             } else {
-                btn.textContent = 'Войти';
+                btn.textContent = compact ? 'Вход' : 'Войти';
                 btn.href = 'auth.html';
             }
         }

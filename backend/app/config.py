@@ -44,6 +44,7 @@ class Settings(BaseSettings):
 
     # Guest access
     guest_lesson_limit: int = 1
+    free_daily_lesson_limit: int = 3
     ai_provider: str = "yandex"  # "yandex" or "groq"
 
     # Groq

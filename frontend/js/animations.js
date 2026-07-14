@@ -4,18 +4,20 @@
 
 const GREETING_PHRASES = [
     'Приветствую!',
-    'Я твой личный Преподаватель.',
-    'Здесь Мы получаем знания.',
+    'Я твой личный преподаватель.',
+    'Здесь мы получаем знания.',
     'УмБаза',
     'Приступим.',
 ];
 
 let greetingTimeline = null;
 let selectedLevel = null;
+let levelBtnPulseTween = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initHeroAnimations();
     initGreetingAnimation();
+    initLevelButtonAnimations();
     initScrollAnimations();
     initOrbAnimations();
     initMagneticButtons();
@@ -27,8 +29,48 @@ function initHeroAnimations() {
     tl.to('.hero-badge', { opacity: 1, y: 0, delay: 0.2 })
       .to('.hero-greeting', { opacity: 1, y: 0 }, '-=0.5')
       .to('.hero-about', { opacity: 1, y: 0 }, '-=0.3')
-      .to('.hero-steps', { opacity: 1, y: 0 }, '-=0.4')
-      .to('.hero-levels', { opacity: 1, y: 0 }, '-=0.4');
+      .to('.hero-levels', { opacity: 1, y: 0 }, '-=0.3')
+      .to('.hero-steps', { opacity: 1, y: 0 }, '-=0.5');
+}
+
+function initLevelButtonAnimations() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const btns = gsap.utils.toArray('.level-btn:not(.level-btn-disabled)');
+    if (!btns.length) return;
+
+    btns.forEach(btn => btn.classList.add('level-btn--hint'));
+
+    levelBtnPulseTween = gsap.to(btns, {
+        y: -4,
+        duration: 1.6,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+        stagger: {
+            each: 0.35,
+            yoyo: true,
+            repeat: -1,
+        },
+    });
+}
+
+function stopLevelButtonAnimations() {
+    if (levelBtnPulseTween) {
+        levelBtnPulseTween.kill();
+        levelBtnPulseTween = null;
+    }
+
+    document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.classList.remove('level-btn--hint');
+        gsap.set(btn, { clearProps: 'y,boxShadow,transform' });
+    });
+}
+
+function resumeLevelButtonAnimations() {
+    if (selectedLevel) return;
+    stopLevelButtonAnimations();
+    initLevelButtonAnimations();
 }
 
 function initGreetingAnimation() {
@@ -59,6 +101,7 @@ function revealWorkspace(levelKey) {
     const config = EDUCATION_LEVELS[levelKey];
     if (!config || !config.enabled) return;
 
+    stopLevelButtonAnimations();
     selectedLevel = levelKey;
 
     document.querySelectorAll('.level-btn').forEach(btn => {
@@ -115,6 +158,7 @@ function hideWorkspace() {
     });
 
     clearFormFields();
+    resumeLevelButtonAnimations();
 }
 
 function populateFormFields(config) {

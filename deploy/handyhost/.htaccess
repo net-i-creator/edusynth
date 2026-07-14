@@ -9,6 +9,8 @@ RewriteRule ^auth/?$ auth.html [L]
 RewriteRule ^account/?$ account.html [L]
 RewriteRule ^news/?$ news.html [L]
 RewriteRule ^faq/?$ faq.html [L]
+RewriteRule ^oferta/?$ oferta.html [L]
+RewriteRule ^confidentiality/?$ confidentiality.html [L]
 
 # Cache static assets
 <IfModule mod_expires.c>

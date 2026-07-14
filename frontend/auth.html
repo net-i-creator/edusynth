@@ -85,6 +85,15 @@
                         <label class="block text-sm font-medium text-theme-secondary mb-1.5">Пароль</label>
                         <input type="password" id="reg-password" required minlength="6" class="input-glass w-full px-4 py-3 text-sm" placeholder="Минимум 6 символов">
                     </div>
+                    <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" id="reg-consent" required class="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-accent-blue focus:ring-accent-blue cursor-pointer">
+                        <span class="text-xs leading-relaxed text-theme-muted">
+                            Я ознакомлен(-а) и принимаю условия
+                            <a href="oferta.html" target="_blank" rel="noopener" class="text-accent-blue hover:underline">Публичной оферты</a>
+                            и
+                            <a href="confidentiality.html" target="_blank" rel="noopener" class="text-accent-blue hover:underline">Политики конфиденциальности и обработки персональных данных</a>.
+                        </span>
+                    </label>
                     <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Зарегистрироваться</button>
                 </form>
 
@@ -145,6 +154,10 @@
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!document.getElementById('reg-consent').checked) {
+                alert('Чтобы зарегистрироваться, примите условия Публичной оферты и Политики конфиденциальности.');
+                return;
+            }
             try {
                 const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
                 const data = await api.register(

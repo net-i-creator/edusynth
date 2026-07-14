@@ -1,10 +1,12 @@
 import uuid
 import logging
+from datetime import datetime, timezone
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import select
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
@@ -26,6 +28,33 @@ from app.config import get_settings
 settings = get_settings()
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/lessons", tags=["lessons"])
+
+
+async def check_generation_access(user: User | None, guest_id: str | None, db: AsyncSession) -> None:
+    """Enforce product limits before cache lookup or expensive generation."""
+    if not user:
+        if not guest_id:
+            raise HTTPException(status_code=400, detail="X-Guest-Id header required for anonymous users")
+        await check_guest_can_generate(guest_id)
+        return
+
+    premium_is_active = (
+        user.subscription_status == "premium"
+        and (user.subscription_expires_at is None or user.subscription_expires_at > datetime.now(timezone.utc))
+    )
+    if premium_is_active:
+        return
+    if user.role == "teacher":
+        raise HTTPException(status_code=402, detail="Teacher subscription required")
+
+    start_of_day = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    result = await db.execute(
+        select(func.count(UserLessonProgress.id))
+        .where(UserLessonProgress.user_id == user.id)
+        .where(UserLessonProgress.started_at >= start_of_day)
+    )
+    if (result.scalar() or 0) >= settings.free_daily_lesson_limit:
+        raise HTTPException(status_code=429, detail="Daily lesson limit reached. Upgrade to continue")
 
 
 async def get_optional_user(
@@ -72,6 +101,8 @@ async def generate_lesson(
     grade_label = validate_lesson_params(data.education_level, data.grade)
     topic_hash = generate_topic_hash(data.topic, data.grade, data.subject, data.education_level)
 
+    await check_generation_access(user, x_guest_id, db)
+
     cached = await get_cached_lesson(topic_hash)
     if cached:
         result = await db.execute(select(Lesson).where(Lesson.topic_hash == topic_hash))
@@ -101,12 +132,10 @@ async def generate_lesson(
             db.add(progress)
             await db.commit()
 
-        return LessonResponse(**cached)
+        if not user and x_guest_id:
+            await record_guest_generation(x_guest_id)
 
-    if not user:
-        if not x_guest_id:
-            raise HTTPException(status_code=400, detail="X-Guest-Id header required for anonymous users")
-        await check_guest_can_generate(x_guest_id)
+        return LessonResponse(**cached)
 
     try:
         content = await generate_lesson_text(

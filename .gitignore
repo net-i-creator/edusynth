@@ -42,3 +42,9 @@ node_modules/
 
 # Uploads
 uploads/
+
+# Deploy / build artifacts
+.deploy-staging/
+.netlify/
+.screenshots/
+dump.rdb
