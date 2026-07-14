@@ -2,6 +2,30 @@
  * Auth utilities
  */
 
+let _siteConfig = null;
+let _siteConfigPromise = null;
+
+async function loadSiteConfig() {
+    if (_siteConfig) return _siteConfig;
+    if (!_siteConfigPromise) {
+        _siteConfigPromise = api.getSiteConfig()
+            .then((cfg) => {
+                _siteConfig = cfg;
+                return cfg;
+            })
+            .catch(() => {
+                _siteConfig = { auth_enabled: true };
+                return _siteConfig;
+            });
+    }
+    return _siteConfigPromise;
+}
+
+function isAuthEnabled() {
+    if (_siteConfig) return _siteConfig.auth_enabled !== false;
+    return true;
+}
+
 function isLoggedIn() {
     return !!localStorage.getItem('access_token');
 }
@@ -42,11 +66,30 @@ function updateAuthUI() {
             const nameEl = document.getElementById('user-name');
             if (nameEl) nameEl.textContent = user.full_name || user.email;
         }
-    } else {
+    } else if (isAuthEnabled()) {
         authButtons.classList.remove('hidden');
+        userMenu.classList.add('hidden');
+    } else {
+        authButtons.classList.add('hidden');
         userMenu.classList.add('hidden');
     }
 }
 
+async function applyAuthVisibility() {
+    await loadSiteConfig();
+    if (isAuthEnabled()) return;
+
+    document.querySelectorAll('[data-auth-only]').forEach((el) => el.classList.add('hidden'));
+
+    const navAccount = document.getElementById('nav-account');
+    if (navAccount && !isLoggedIn()) {
+        navAccount.classList.add('hidden');
+    }
+}
+
 // Initialize auth UI on page load
-document.addEventListener('DOMContentLoaded', updateAuthUI);
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadSiteConfig();
+    updateAuthUI();
+    applyAuthVisibility();
+});

@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 30
 
+    # Auth (set AUTH_ENABLED=false to temporarily disable login/registration)
+    auth_enabled: bool = False
+
     # Guest access
     guest_lesson_limit: int = 1
     free_daily_lesson_limit: int = 3

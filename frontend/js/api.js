@@ -101,6 +101,10 @@ class ApiClient {
         return false;
     }
 
+    async getSiteConfig() {
+        return this.request('/api/config');
+    }
+
     async register(email, password, fullName, role = 'student', phone = null) {
         return this.request('/api/auth/register', {
             method: 'POST',

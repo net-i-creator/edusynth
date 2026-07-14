@@ -115,7 +115,7 @@
                 <article class="plan-card glass plan-featured">
                     <div class="plan-kicker">Ученик</div><h3>3 урока в день</h3>
                     <p>Бесплатный кабинет, история занятий и результаты квизов.</p>
-                    <a href="auth.html?mode=register" class="plan-link">Зарегистрироваться →</a>
+                    <a href="auth.html?mode=register" class="plan-link" data-auth-only>Зарегистрироваться →</a>
                 </article>
                 <article class="plan-card glass">
                     <div class="plan-kicker">Родитель и педагог</div><h3>Расширенный доступ</h3>
@@ -340,9 +340,11 @@
     <script src="js/guest-limit.js"></script>
     <script src="js/animations.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSiteConfig();
             updateNavAccount();
             updateGuestHint();
+            applyAuthVisibility();
         });
 
         function updateNavAccount() {
@@ -352,7 +354,11 @@
             if (isLoggedIn()) {
                 btn.textContent = compact ? 'Кабинет' : 'Личный кабинет';
                 btn.href = 'account.html';
+                btn.classList.remove('hidden');
+            } else if (!isAuthEnabled()) {
+                btn.classList.add('hidden');
             } else {
+                btn.classList.remove('hidden');
                 btn.textContent = compact ? 'Вход' : 'Войти';
                 btn.href = 'auth.html';
             }

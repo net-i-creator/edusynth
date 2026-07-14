@@ -19,6 +19,7 @@ echo "==> Setting environment variables..."
 if [ -f "$ROOT/.env" ]; then
   GROQ_KEY=$(grep '^GROQ_API_KEY=' "$ROOT/.env" | cut -d= -f2-)
   npx @railway/cli variables set \
+    AUTH_ENABLED=false \
     AI_PROVIDER=groq \
     GROQ_MODEL=llama-3.3-70b-versatile \
     IMAGE_PROVIDER=web_search \

@@ -31,11 +31,15 @@
 
     <main class="flex-1 flex items-center justify-center px-6 py-12">
         <div class="w-full max-w-md">
+            <div id="auth-disabled-notice" class="hidden mb-6 p-4 rounded-xl glass border border-slate-200 text-sm text-theme-secondary text-center">
+                Регистрация и вход временно недоступны. Попробуйте позже или напишите нам в поддержку.
+            </div>
+
             <div id="limit-notice" class="hidden mb-6 p-4 rounded-xl glass border border-amber-200 bg-amber-50/50 text-sm text-amber-800">
                 Вы использовали бесплатный урок. Войдите или зарегистрируйтесь, чтобы продолжить.
             </div>
 
-            <div class="glass-strong rounded-2xl p-6 md:p-8">
+            <div class="glass-strong rounded-2xl p-6 md:p-8" id="auth-card">
                 <h1 class="text-2xl font-bold text-theme-primary mb-1" id="auth-title">Вход</h1>
                 <p class="text-sm text-theme-muted mb-6">Личный кабинет УмБаза</p>
 
@@ -112,8 +116,16 @@
         const isLimit = params.get('reason') === 'limit';
         const redirect = params.get('redirect') || '/';
 
-        if (isLimit) document.getElementById('limit-notice').classList.remove('hidden');
-        if (isRegister) showRegister();
+        loadSiteConfig().then(() => {
+            if (!isAuthEnabled()) {
+                document.getElementById('auth-disabled-notice').classList.remove('hidden');
+                document.getElementById('auth-card').classList.add('hidden');
+                return;
+            }
+
+            if (isLimit) document.getElementById('limit-notice').classList.remove('hidden');
+            if (isRegister) showRegister();
+        });
 
         let registerMode = isRegister;
 

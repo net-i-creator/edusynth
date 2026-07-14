@@ -34,6 +34,13 @@ function canGenerateAsGuest() {
 function requireAuthForGeneration() {
     if (canGenerateAsGuest()) return true;
 
+    if (typeof isAuthEnabled === 'function' && !isAuthEnabled()) {
+        if (typeof showToast === 'function') {
+            showToast('Регистрация и вход временно недоступны', 'info');
+        }
+        return false;
+    }
+
     const redirect = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.href = `auth.html?reason=limit&redirect=${redirect}`;
     return false;
@@ -48,13 +55,24 @@ function onLessonGenerated() {
 function getGuestRemainingText() {
     if (typeof isLoggedIn === 'function' && isLoggedIn()) return null;
     const remaining = GUEST_LESSON_LIMIT - getGuestLessonCount();
-    if (remaining <= 0) return 'Бесплатный урок использован — войдите для продолжения';
+    if (remaining <= 0) {
+        if (typeof isAuthEnabled === 'function' && !isAuthEnabled()) {
+            return 'Бесплатный урок использован';
+        }
+        return 'Бесплатный урок использован — войдите для продолжения';
+    }
     if (remaining === 1) return '1 бесплатный урок без регистрации';
     return null;
 }
 
 function handleGuestLimitError(error) {
     if (error && error.message && error.message.includes('Guest limit')) {
+        if (typeof isAuthEnabled === 'function' && !isAuthEnabled()) {
+            if (typeof showToast === 'function') {
+                showToast('Регистрация и вход временно недоступны', 'info');
+            }
+            return true;
+        }
         const redirect = encodeURIComponent(window.location.pathname);
         window.location.href = `auth.html?reason=limit&redirect=${redirect}`;
         return true;

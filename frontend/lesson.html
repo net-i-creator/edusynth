@@ -139,7 +139,7 @@
             <div class="plan-kicker">Первый урок готов</div>
             <h3 class="text-xl font-semibold text-theme-primary mb-2">Продолжим обучение?</h3>
             <p class="text-sm text-theme-secondary mb-5">Создайте бесплатный кабинет и получайте до трёх персональных уроков в сутки с сохранением прогресса.</p>
-            <a href="auth.html?mode=register&reason=limit&redirect=/" class="btn-primary block w-full py-3 text-sm text-center">Создать кабинет</a>
+            <a href="auth.html?mode=register&reason=limit&redirect=/" class="btn-primary block w-full py-3 text-sm text-center" data-auth-only>Создать кабинет</a>
             <button onclick="closeGuestSignup()" class="w-full mt-3 text-sm text-theme-muted">Остаться на уроке</button>
         </div>
     </div>
@@ -161,9 +161,11 @@
             document.getElementById('guest-signup-modal').classList.remove('active');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSiteConfig();
+            applyAuthVisibility();
             loadLesson();
-            if (!isLoggedIn() && sessionStorage.getItem('show_guest_signup') === '1') {
+            if (!isLoggedIn() && isAuthEnabled() && sessionStorage.getItem('show_guest_signup') === '1') {
                 sessionStorage.removeItem('show_guest_signup');
                 setTimeout(() => document.getElementById('guest-signup-modal').classList.add('active'), 900);
             }

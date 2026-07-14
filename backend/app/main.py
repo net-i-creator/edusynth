@@ -47,6 +47,11 @@ app.include_router(quiz.router)
 app.include_router(dashboard.router)
 
 
+@app.get("/api/config")
+async def site_config():
+    return {"auth_enabled": settings.auth_enabled}
+
+
 @app.get("/health")
 async def health_check():
     db_ok = False

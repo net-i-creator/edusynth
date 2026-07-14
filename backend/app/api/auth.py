@@ -8,12 +8,23 @@ from app.schemas.auth import UserRegister, UserLogin, UserResponse, TokenRespons
 from app.services.auth import register_user, authenticate_user, create_access_token, create_refresh_token, decode_token, get_user_by_id
 from app.api.deps import get_current_user
 from app.models.user import User
+from app.config import get_settings
 
+settings = get_settings()
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+def _require_auth_enabled() -> None:
+    if not settings.auth_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Регистрация и вход временно недоступны",
+        )
 
 
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserRegister, db: Annotated[AsyncSession, Depends(get_db)]):
+    _require_auth_enabled()
     try:
         user = await register_user(
             db, data.email, data.password, data.full_name, data.phone, data.role
@@ -29,6 +40,7 @@ async def register(data: UserRegister, db: Annotated[AsyncSession, Depends(get_d
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: UserLogin, db: Annotated[AsyncSession, Depends(get_db)]):
+    _require_auth_enabled()
     user = await authenticate_user(db, data.email, data.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
