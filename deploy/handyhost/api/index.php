@@ -1,21 +1,65 @@
 <?php
 /**
  * Proxies /api/* requests to the Render backend.
- * Keeps the frontend and API on the same origin (no CORS issues).
+ * Locally handles POST /api/support → partners@умбаза.рф via PHP mail().
  */
 $BACKEND = 'https://edusynth.onrender.com';
+$SUPPORT_TO = 'partners@xn--80aabzw5b.xn--p1ai'; // partners@умбаза.рф
 
 $uri = $_SERVER['REQUEST_URI'];
 $path = parse_url($uri, PHP_URL_PATH);
 $query = parse_url($uri, PHP_URL_QUERY);
+$method = $_SERVER['REQUEST_METHOD'];
+$body = file_get_contents('php://input');
+
+// --- Local support form handler ---
+if ($method === 'POST' && preg_match('#/api/support/?$#', $path)) {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+
+    $data = json_decode($body ?: '{}', true);
+    if (!is_array($data)) {
+        http_response_code(400);
+        echo json_encode(['detail' => 'Некорректный запрос'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $email = trim((string)($data['email'] ?? ''));
+    $message = trim((string)($data['message'] ?? ''));
+
+    if ($email === '' || $message === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(['detail' => 'Заполните корректный email и сообщение'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $subject = '=?UTF-8?B?' . base64_encode('Обратная связь УмБаза от ' . $email) . '?=';
+    $bodyText = "От: {$email}\n\n{$message}\n";
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: 8bit',
+        'From: UmBaza Support <noreply@' . ($_SERVER['HTTP_HOST'] ?? 'umbaza.rf') . '>',
+        'Reply-To: ' . $email,
+    ];
+
+    $ok = @mail($SUPPORT_TO, $subject, $bodyText, implode("\r\n", $headers));
+    if (!$ok) {
+        // Fall through to Render backend as a second attempt
+    } else {
+        http_response_code(200);
+        echo json_encode([
+            'ok' => true,
+            'detail' => 'Сообщение отправлено на partners@умбаза.рф',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
 
 $target = rtrim($BACKEND, '/') . $path;
 if ($query) {
     $target .= '?' . $query;
 }
-
-$method = $_SERVER['REQUEST_METHOD'];
-$body = file_get_contents('php://input');
 
 $headers = ['Content-Type: application/json'];
 if (!empty($_SERVER['CONTENT_TYPE'])) {

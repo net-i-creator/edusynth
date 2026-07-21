@@ -31,3 +31,7 @@ pytest==8.3.3
 pytest-asyncio==0.24.0
 
 ddgs>=7.0.0
+
+# Google Sheets user sync
+gspread==6.1.4
+google-auth==2.35.0

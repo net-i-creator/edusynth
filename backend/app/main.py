@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.api import auth, lessons, quiz, dashboard
+from app.api import auth, lessons, quiz, dashboard, support
 
 settings = get_settings()
 
@@ -42,6 +42,7 @@ app.add_middleware(
 
 # Routes
 app.include_router(auth.router)
+app.include_router(support.router)
 app.include_router(lessons.router)
 app.include_router(quiz.router)
 app.include_router(dashboard.router)
@@ -49,7 +50,10 @@ app.include_router(dashboard.router)
 
 @app.get("/api/config")
 async def site_config():
-    return {"auth_enabled": settings.auth_enabled}
+    return {
+        "auth_enabled": settings.auth_enabled,
+        "support_email": settings.support_email,
+    }
 
 
 @app.get("/health")

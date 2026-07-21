@@ -44,6 +44,24 @@ class Settings(BaseSettings):
 
     # Auth (set AUTH_ENABLED=false to temporarily disable login/registration)
     auth_enabled: bool = False
+    frontend_url: str = "https://xn--80aabzw5b.xn--p1ai"
+    password_reset_expire_minutes: int = 60
+
+    # Email / SMTP (password reset + support notifications)
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    smtp_use_tls: bool = True
+    support_email: str = "partners@умбаза.рф"
+
+    # Google Sheets user registry (no passwords)
+    google_sheets_id: str = ""
+    google_sheets_worksheet: str = "Users"
+    google_service_account_json: str = ""  # raw JSON or path to JSON file
+    google_service_account_file: str = ""
+    admin_sync_secret: str = ""
 
     # Guest access
     guest_lesson_limit: int = 1

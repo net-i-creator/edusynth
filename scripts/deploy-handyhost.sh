@@ -27,9 +27,10 @@ cd $REMOTE_DIR
 chmod 644 index.html lesson.html account.html auth.html faq.html news.html oferta.html confidentiality.html .htaccess
 chmod 755 css js assets api
 chmod 644 css/styles.css api/index.php assets/minobr-emblem.png
+chmod 755 assets/brand assets/logos
+chmod 644 assets/brand/umbaza-mark-v2.png
+chmod 644 assets/logos/vk-square.png assets/logos/max-square.png assets/logos/yookassa.png assets/logos/sbp.png assets/logos/tochka.png 2>/dev/null || true
 chmod 644 js/animations.js js/api.js js/auth.js js/education-config.js js/guest-limit.js js/site-config.js js/yandex-metrika.js
-chmod 755 assets/logos
-chmod 644 assets/logos/vk-square.png assets/logos/max-square.png
 chmod 755 news
 glob -a chmod 644 news/*.html
 glob -a rm -r .DS_Store

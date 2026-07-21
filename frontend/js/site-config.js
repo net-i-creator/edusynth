@@ -4,7 +4,11 @@
 const SITE_CONFIG = {
     social: {
         vk: 'https://vk.com/UmBazaRF',
-        max: 'https://max.ru/join/S42G2LXAaTZxptGMZhW8WdAO5-JMEpFv10IccQvNNsI',
+        max: 'https://max.ru/channel_UmBaza',
+    },
+    support: {
+        email: 'partners@умбаза.рф',
+        emailAscii: 'partners@xn--80aabzw5b.xn--p1ai',
     },
     payments: {
         yookassa: 'https://yookassa.ru/',

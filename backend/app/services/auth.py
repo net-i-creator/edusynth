@@ -73,3 +73,18 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> User
 async def get_user_by_id(db: AsyncSession, user_id: uuid.UUID) -> User | None:
     result = await db.execute(select(User).where(User.id == user_id))
     return result.scalar_one_or_none()
+
+
+async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
+    from sqlalchemy import func
+
+    normalized = email.lower().strip()
+    result = await db.execute(select(User).where(func.lower(User.email) == normalized))
+    return result.scalar_one_or_none()
+
+
+async def set_user_password(db: AsyncSession, user: User, new_password: str) -> User:
+    user.password_hash = hash_password(new_password)
+    await db.commit()
+    await db.refresh(user)
+    return user

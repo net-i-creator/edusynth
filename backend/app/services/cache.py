@@ -88,3 +88,31 @@ async def invalidate_session(user_id: UUID) -> None:
         await client.delete(f"session:{user_id}")
     except Exception as e:
         logger.warning("Redis session delete failed: %s", e)
+
+
+async def store_password_reset_token(token: str, user_id: UUID, ttl_seconds: int = 3600) -> bool:
+    client = _get_redis()
+    if not client:
+        return False
+    try:
+        await client.set(f"pwdreset:{token}", str(user_id), ex=ttl_seconds)
+        return True
+    except Exception as e:
+        logger.warning("Redis password-reset write failed: %s", e)
+        return False
+
+
+async def consume_password_reset_token(token: str) -> UUID | None:
+    client = _get_redis()
+    if not client:
+        return None
+    try:
+        key = f"pwdreset:{token}"
+        user_id = await client.get(key)
+        if not user_id:
+            return None
+        await client.delete(key)
+        return UUID(user_id)
+    except Exception as e:
+        logger.warning("Redis password-reset read failed: %s", e)
+        return None

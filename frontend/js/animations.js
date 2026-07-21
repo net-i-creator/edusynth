@@ -3,11 +3,7 @@
  */
 
 const GREETING_PHRASES = [
-    'Приветствую!',
-    'Я твой личный преподаватель.',
-    'Здесь мы получаем знания.',
-    'УмБаза',
-    'Приступим.',
+    'Ум — это База',
 ];
 
 let greetingTimeline = null;
@@ -76,6 +72,16 @@ function resumeLevelButtonAnimations() {
 function initGreetingAnimation() {
     const el = document.getElementById('greeting-text');
     if (!el) return;
+
+    // Single slogan: soft entrance, stay visible (no cycling)
+    if (GREETING_PHRASES.length === 1) {
+        el.textContent = GREETING_PHRASES[0];
+        gsap.fromTo(el,
+            { opacity: 0, y: 16, filter: 'blur(6px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.9, delay: 0.35, ease: 'power2.out' }
+        );
+        return;
+    }
 
     greetingTimeline = gsap.timeline({ repeat: -1, repeatDelay: 1.5, delay: 1.2 });
 

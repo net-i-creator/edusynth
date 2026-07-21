@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход — УмБаза</title>
+    <link rel="icon" type="image/png" href="assets/brand/umbaza-mark-v2.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,8 +21,8 @@
     <nav class="relative z-10 border-b border-theme">
         <div class="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg glass-strong flex items-center justify-center">
-                    <span class="text-accent-blue font-bold text-xs">У</span>
+                <div class="brand-logo-compact">
+                    <img src="assets/brand/umbaza-mark-v2.png" alt="" class="brand-mark brand-mark--compact">
                 </div>
                 <span class="font-bold text-theme-primary">УмБаза</span>
             </a>
@@ -49,10 +50,35 @@
                         <input type="email" id="login-email" required class="input-glass w-full px-4 py-3 text-sm" placeholder="you@example.com">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Пароль</label>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-sm font-medium text-theme-secondary">Пароль</label>
+                            <button type="button" id="show-forgot" class="text-xs text-accent-blue hover:underline">Забыли пароль?</button>
+                        </div>
                         <input type="password" id="login-password" required class="input-glass w-full px-4 py-3 text-sm" placeholder="••••••••">
                     </div>
                     <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Войти</button>
+                </form>
+
+                <form id="forgot-form" class="space-y-4 hidden">
+                    <p class="text-sm text-theme-secondary">Введите email — пришлём ссылку для сброса пароля.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Email</label>
+                        <input type="email" id="forgot-email" required class="input-glass w-full px-4 py-3 text-sm" placeholder="you@example.com">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Отправить ссылку</button>
+                </form>
+
+                <form id="reset-form" class="space-y-4 hidden">
+                    <p class="text-sm text-theme-secondary">Придумайте новый пароль для входа.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Новый пароль</label>
+                        <input type="password" id="reset-password" required minlength="6" class="input-glass w-full px-4 py-3 text-sm" placeholder="Минимум 6 символов">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-theme-secondary mb-1.5">Повторите пароль</label>
+                        <input type="password" id="reset-password2" required minlength="6" class="input-glass w-full px-4 py-3 text-sm" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 text-sm font-semibold">Сохранить пароль</button>
                 </form>
 
                 <form id="register-form" class="space-y-4 hidden">
@@ -113,8 +139,25 @@
     <script>
         const params = new URLSearchParams(window.location.search);
         const isRegister = params.get('mode') === 'register';
+        const isForgot = params.get('mode') === 'forgot';
+        const isReset = params.get('mode') === 'reset';
+        const resetToken = params.get('token') || '';
         const isLimit = params.get('reason') === 'limit';
         const redirect = params.get('redirect') || '/';
+
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const forgotForm = document.getElementById('forgot-form');
+        const resetForm = document.getElementById('reset-form');
+        const toggleAuth = document.getElementById('toggle-auth');
+        const authTitle = document.getElementById('auth-title');
+
+        function hideAllForms() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            forgotForm.classList.add('hidden');
+            resetForm.classList.add('hidden');
+        }
 
         loadSiteConfig().then(() => {
             if (!isAuthEnabled()) {
@@ -124,28 +167,55 @@
             }
 
             if (isLimit) document.getElementById('limit-notice').classList.remove('hidden');
-            if (isRegister) showRegister();
+            if (isReset && resetToken) showReset();
+            else if (isForgot) showForgot();
+            else if (isRegister) showRegister();
         });
 
         let registerMode = isRegister;
 
         document.getElementById('toggle-auth').addEventListener('click', () => {
+            if (!forgotForm.classList.contains('hidden') || !resetForm.classList.contains('hidden')) {
+                showLogin();
+                registerMode = false;
+                return;
+            }
             registerMode = !registerMode;
             registerMode ? showRegister() : showLogin();
         });
 
+        document.getElementById('show-forgot').addEventListener('click', () => showForgot());
+
         function showRegister() {
-            document.getElementById('auth-title').textContent = 'Регистрация';
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('register-form').classList.remove('hidden');
-            document.getElementById('toggle-auth').textContent = 'Уже есть аккаунт? Войти';
+            hideAllForms();
+            authTitle.textContent = 'Регистрация';
+            registerForm.classList.remove('hidden');
+            toggleAuth.textContent = 'Уже есть аккаунт? Войти';
+            toggleAuth.classList.remove('hidden');
         }
 
         function showLogin() {
-            document.getElementById('auth-title').textContent = 'Вход';
-            document.getElementById('register-form').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('toggle-auth').textContent = 'Нет аккаунта? Регистрация';
+            hideAllForms();
+            authTitle.textContent = 'Вход';
+            loginForm.classList.remove('hidden');
+            toggleAuth.textContent = 'Нет аккаунта? Регистрация';
+            toggleAuth.classList.remove('hidden');
+        }
+
+        function showForgot() {
+            hideAllForms();
+            authTitle.textContent = 'Восстановление пароля';
+            forgotForm.classList.remove('hidden');
+            toggleAuth.textContent = 'Вернуться ко входу';
+            toggleAuth.classList.remove('hidden');
+        }
+
+        function showReset() {
+            hideAllForms();
+            authTitle.textContent = 'Новый пароль';
+            resetForm.classList.remove('hidden');
+            toggleAuth.textContent = 'Вернуться ко входу';
+            toggleAuth.classList.remove('hidden');
         }
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -161,6 +231,34 @@
                 window.location.href = redirect;
             } catch (err) {
                 alert(err.message || 'Ошибка входа');
+            }
+        });
+
+        document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const data = await api.forgotPassword(document.getElementById('forgot-email').value);
+                alert(data.detail || 'Если аккаунт существует, ссылка отправлена на email.');
+                showLogin();
+            } catch (err) {
+                alert(err.message || 'Не удалось отправить ссылку');
+            }
+        });
+
+        document.getElementById('reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('reset-password').value;
+            const password2 = document.getElementById('reset-password2').value;
+            if (password !== password2) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            try {
+                const data = await api.resetPassword(resetToken, password);
+                alert(data.detail || 'Пароль обновлён');
+                window.location.href = 'auth.html';
+            } catch (err) {
+                alert(err.message || 'Не удалось обновить пароль');
             }
         });
 
@@ -188,7 +286,7 @@
             }
         });
 
-        if (isLoggedIn()) window.location.href = redirect === '/' ? 'account.html' : redirect;
+        if (isLoggedIn() && !isReset) window.location.href = redirect === '/' ? 'account.html' : redirect;
 
         document.querySelectorAll('.role-option input').forEach(input => {
             input.addEventListener('change', () => {

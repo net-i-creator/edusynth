@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>УмБаза — AI-генератор школьных уроков</title>
     <meta name="description" content="Бесплатный AI-генератор школьных уроков с иллюстрациями и квизом">
+    <link rel="icon" type="image/png" href="assets/brand/umbaza-mark-v2.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -57,7 +58,7 @@
         <div class="site-nav__inner max-w-6xl mx-auto px-4 sm:px-6">
             <a href="/" class="site-nav__brand">
                 <div class="site-nav__logo">
-                    <span class="text-accent-blue font-bold text-sm">У</span>
+                    <img src="assets/brand/umbaza-mark-v2.png" alt="" class="brand-mark brand-mark--nav">
                 </div>
                 <span class="site-nav__title">УмБаза</span>
             </a>
@@ -69,7 +70,7 @@
             <a href="https://vk.com/UmBazaRF" data-link-vk target="_blank" rel="noopener noreferrer" class="social-icon social-icon--app site-nav__social-vk" title="ВКонтакте" aria-label="ВКонтакте">
                 <img src="assets/logos/vk-square.png" alt="">
             </a>
-            <a href="https://max.ru/join/S42G2LXAaTZxptGMZhW8WdAO5-JMEpFv10IccQvNNsI" data-link-max target="_blank" rel="noopener noreferrer" class="social-icon social-icon--app" title="MAX" aria-label="MAX">
+            <a href="https://max.ru/channel_UmBaza" data-link-max target="_blank" rel="noopener noreferrer" class="social-icon social-icon--app" title="MAX" aria-label="MAX">
                 <img src="assets/logos/max-square.png" alt="">
             </a>
             <a href="account.html" id="nav-account" class="btn-account">Войти</a>
@@ -80,12 +81,19 @@
 
         <!-- HERO — animated greeting -->
         <section class="text-center mb-14 md:mb-16">
+            <div class="hero-brand" aria-label="УмБаза — Ум это База">
+                <span class="hero-brand__overline">Образовательная AI-платформа</span>
+                <div class="hero-brand__mark-wrap" aria-hidden="true">
+                    <span class="hero-brand__glow"></span>
+                    <img src="assets/brand/umbaza-mark-v2.png" alt="" class="brand-mark brand-mark--hero">
+                </div>
+            </div>
             <div class="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-accent-blue mb-8">
                 <span class="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse"></span>
                 Персональное обучение с AI
             </div>
             <div class="hero-greeting greeting-hero mb-4">
-                <h1 id="greeting-text" class="greeting-text" aria-live="polite">Приветствую!</h1>
+                <h1 id="greeting-text" class="greeting-text greeting-text--slogan" aria-live="polite">Ум — это База</h1>
             </div>
             <p class="text-base text-theme-secondary max-w-lg mx-auto">
                 Сложная тема превращается в понятный урок, наглядные примеры и проверку знаний — за одну минуту.
@@ -294,7 +302,7 @@
                 <span class="text-theme-muted">·</span>
                 <a href="https://vk.com/umbaza" data-link-vk target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">ВКонтакте</a>
                 <span class="text-theme-muted">·</span>
-                <a href="https://max.ru/umbaza" data-link-max target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">MAX</a>
+                <a href="https://max.ru/channel_UmBaza" data-link-max target="_blank" rel="noopener" class="text-xs text-theme-muted hover:text-accent-blue">MAX</a>
                 <span class="text-theme-muted hidden" id="extra-footer-sep">·</span>
                 <a href="#" id="extra-footer-link" class="text-xs text-theme-muted hover:text-accent-blue hidden">О проекте</a>
             </div>
@@ -315,7 +323,10 @@
             <button class="modal-close" onclick="closeSupport()" aria-label="Закрыть">×</button>
             <div class="plan-kicker">Поддержка УмБазы</div>
             <h3 class="text-xl font-semibold text-theme-primary mb-2">Чем можем помочь?</h3>
-            <p class="text-sm text-theme-secondary mb-5">Опишите вопрос — черновик сохранится, затем откроется чат поддержки ВКонтакте.</p>
+            <p class="text-sm text-theme-secondary mb-5">
+                Опишите вопрос — сообщение уйдёт на
+                <a href="mailto:partners@умбаза.рф" class="text-accent-blue hover:underline">partners@умбаза.рф</a>.
+            </p>
             <label class="block text-sm font-medium text-theme-secondary mb-1.5">Ваш email</label>
             <input id="support-email" type="email" class="input-glass w-full px-4 py-3 text-sm mb-3" placeholder="you@example.com">
             <label class="block text-sm font-medium text-theme-secondary mb-1.5">Сообщение</label>
@@ -389,14 +400,21 @@
             if (e && e.target !== e.currentTarget) return;
             document.getElementById('support-modal').classList.remove('active');
         }
-        function sendSupport() {
+        async function sendSupport() {
             const email = document.getElementById('support-email').value.trim();
             const message = document.getElementById('support-message').value.trim();
             if (!email || !message) return showToast('Заполните email и сообщение', 'error');
             localStorage.setItem('support_draft', JSON.stringify({ email, message, createdAt: new Date().toISOString() }));
-            closeSupport();
-            showToast('Черновик сохранён. Открываем чат поддержки.', 'success');
-            window.open(SITE_CONFIG.social.vk, '_blank', 'noopener');
+            try {
+                await api.sendSupport(email, message);
+                closeSupport();
+                showToast('Сообщение отправлено на partners@умбаза.рф', 'success');
+            } catch (err) {
+                const mailto = `mailto:${SITE_CONFIG.support?.email || 'partners@умбаза.рф'}?subject=${encodeURIComponent('Обратная связь УмБаза')}&body=${encodeURIComponent('От: ' + email + '\n\n' + message)}`;
+                closeSupport();
+                showToast(err.message || 'Открываем почтовый клиент…', 'info');
+                window.location.href = mailto;
+            }
         }
         function selectLevel(level) {
             const config = EDUCATION_LEVELS[level];
